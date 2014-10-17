@@ -1,0 +1,87 @@
+#maincontainer {
+    width: 960px;
+    height: 800px;
+    background: #00ff21;
+    margin: auto;
+    padding: 20px;
+    overflow: hidden;
+    font-family: "Verdana", "Arial", sans-serif;
+    -moz-box-shadow: 0 0 5px 10px rgba(25,25,25,0.1);
+    -webkit-box-shadow: 0 0 5px 10px rgba(25,25,25,0.1);
+    box-shadow: 0 0 5px 10px rgba(25,25,25,0.1);
+    background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #7D7A82), color-stop(1, #FFF));
+    background: -webkit-linear-gradient(top, #7D7A82 5%, #FFF 100%);
+    background: -moz-linear-gradient( top, #7D7A82 5%, #FFF 100% );
+    background: -o-linear-gradient(top, #7D7A82 5%, #FFF 100%);
+    background: linear-gradient(top, #7D7A82 5%, #FFF 100%);
+}
+
+h1 {
+	text-align: center;
+    color: #3B393D;
+    text-shadow: 2px 2px 0 #FFF;
+}
+
+#formwrapper {
+    text-align: center;
+    padding-top: 20px;
+}
+
+#file, #location {
+    margin-right: 10px;
+    margin-left: 5px;
+    padding: 5px;
+    font-family: "Verdana", "Arial", sans-serif;
+    font-size: 11px;
+    color: #FFF;
+    -moz-box-shadow: 0 0 4px 0 #777;
+    -webkit-box-shadow: 0 0 4px 0 #777;
+    box-shadow: 0 0 4px 0 #777;
+    -webkit-border-radius: 5px;  
+    -moz-border-radius: 5px;  
+    border-radius: 5px;
+    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #575757), color-stop(1, #FFF) );
+    background: -webkit-linear-gradient(top, #575757 5%, #FFF 100%);
+    background:-moz-linear-gradient( center top, #575757 5%, #FFF 100% );
+    background: -o-linear-gradient(top, #575757 5%, #FFF 100%);
+    background: linear-gradient(#575757 5%, #FFF 100%);
+}
+
+#uploadButton {
+    width: auto;  
+    padding: 3px;
+    font-family: "Verdana", "Arial", sans-serif;
+    font-size: 11px;
+    -moz-box-shadow: 0 0 4px 0 #777;
+    -webkit-box-shadow: 0 0 4px 0 #777;
+    box-shadow: 0 0 4px 0 #777;
+    -webkit-border-radius: 5px;  
+    -moz-border-radius: 5px;  
+    border-radius: 5px;
+    background: -webkit-gradient(
+        linear,
+        left bottom,
+        left top,
+        color-stop(0, rgb(237,237,237)),
+        color-stop(0.41, rgb(217,217,217)),
+        color-stop(1, rgb(255,255,255))
+    );
+    background: -webkit-linear-gradient( 
+        center bottom,
+        rgb(237,237,237) 0%,
+        rgb(217,217,217) 41%,
+        rgb(255,255,255) 100%
+    );
+    background: -moz-linear-gradient(
+        center bottom,
+        rgb(237,237,237) 0%,
+        rgb(217,217,217) 41%,
+        rgb(255,255,255) 100%
+    );
+    background: -o-linear-gradient(
+        center bottom,
+        rgb(237,237,237) 0%,
+        rgb(217,217,217) 41%,
+        rgb(255,255,255) 100%
+    );
+}

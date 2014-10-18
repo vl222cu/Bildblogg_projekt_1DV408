@@ -46,8 +46,16 @@ class PostView {
 		 	<div id='maincontainer'>
 		 		<div id='content'>
 		 			<h1>Vivis bildblogg</h1>
-		 			<p><a href='?return'>Tillbaka</a></p>
-					<div id='formwrapper'>
+		 			<p><a href='?return'>Tillbaka</a></p>";
+
+		if($this->getMessage() !== null) {
+
+			$html .= $this->message;
+
+		};
+		
+		$html .= "			
+			<div id='formwrapper'>
 				 		<form action='?upload' method='post' enctype='multipart/form-data'>
 							Välj bild och skriv gärna en kommentar: <input type='file' name='file' id='file' />  
 							<input type='text' name='comment' id='comment' placeholder='Lägg till kommentar' /> 
@@ -98,9 +106,27 @@ class PostView {
 
     }
 
+    public function getImage() {
+
+    	if (isset( $_FILES["file"]) && !empty($_FILES["file"]["name"])) {
+
+    		return $_FILES["file"]["name"];
+  		}
+  
+    }
+
+    public function getImageType() {
+
+    	if (isset( $_FILES["file"]["type"]) && !empty( $_FILES["file"]["type"])) {
+
+    		return $_FILES["file"]["type"];
+  		}
+  
+    }
+
     public function getComment() {
 
-    	if(isset($_POST[$this->strComment])){
+    	if(isset($_POST[$this->strComment])) {
 
 	        return  $_POST[$this->strComment];
 

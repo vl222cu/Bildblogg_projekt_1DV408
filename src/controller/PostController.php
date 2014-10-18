@@ -55,16 +55,18 @@ class PostController {
 
 	public function upLoadImage() {
 
-		if($this->postModel->isValidImage()) {
+		if($this->postModel->isValidImage($this->postView->getImageType())) {
 
-			$this->postRepository->saveImage();
+			$this->postRepository->saveImage($this->postView->getImage(), $this->postView->getComment());
 			$this->postView->setMessage(\view\PostView::MESSAGE_ERROR_UPLOAD_SUCCESSED);
+
 			return $this->postView->uploadPageHTML();
 
 		} else {
 
 			$this->postView->setMessage(\view\PostView::MESSAGE_ERROR_UPLOAD_FAILED);
-			return $this->postView->mainPageHTML();
+
+			return $this->postView->uploadPageHTML();
 		}
 
 	}

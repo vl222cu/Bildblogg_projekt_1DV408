@@ -6,33 +6,33 @@ require_once ('./src/model/Repository.php');
 
 class PostRepository extends base\Repository {
 
-	private static $strImage = 'image';
-	private static $strComment = 'comment';
-	private static $dateStamp = 'dateAdded';
+	private static $strImage = "image";
+	private static $strComment = "comment";
+	private static $dateStamp = "dateAdded";
 	private $imageFolder = "./images/";
 
 	 public function __construct() {
 
-    	$this->dbTable = 'photos';
+    	$this->dbTable = "photos";
     }
 
-	public function saveImage() {
+	public function saveImage($img, $comment) {
 
 		//Katalog i servern där bilderna sparas
 		$targetImg = "./images/";
-		$targetImg = $target . basename( $_FILES["file"]["name"]);
-		var_dump($_FILES["file"]["name"]);
-		$targetImg = explode(".", $target);
-		$targetImg = time().'.'.array_pop($target);
+		$targetImg = $targetImg . basename($img);
+		$targetImg = explode(".", $targetImg);
 
-		$comment = $this->postView->getComment();
+		/*Använder tid som namn för bildfilen för att förhindra
+		att bilder med samma namn skrivs över*/
+		$targetImg = time().'.'.array_pop($targetImg);
 
 		//Sparar informationen i databasen
 		$db = $this->connection();
 
-    	$sql = "INSERT INTO $this->dbTable (" . self::$strImage . ", " . self::$strComment . ", ".self::$dateStamp.") VALUES (?, ?, ?)";
+    	$sql = "INSERT INTO $this->dbTable (" . self::$strImage . ", " . self::$strComment . ") VALUES (?, ?)";
     	$query = $db->prepare($sql);
-    	$params = array($targetImg, $comment, CURDATE());
+    	$params = array($targetImg, $comment);
     	$statement = $query->execute($params); 
 
     	if($statement) {

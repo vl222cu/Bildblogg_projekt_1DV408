@@ -13,19 +13,9 @@ class PostModel {
 		|| ($_FILES["file"]["type"] == "image/jpg")
 		|| ($_FILES["file"]["type"] == "image/png"))
 		&& ($_FILES["file"]["size"] < 2000000)) {
-	    
-	    	//Katalog i servern där bilderna sparas
-			$target = "images/";
-			$target = $target . basename( $_FILES['file']['name']);
-			$target = explode(".", $target);
-			$target = time().'.'.array_pop($target);
 
-			$ret = $this->postRepository->add($target);
+			return true;
 
-			if ($ret == true) {
-
-				return true;
-			}
 		}
 
 		return false;

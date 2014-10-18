@@ -4,15 +4,18 @@ namespace controller;
 
 require_once("./src/view/PostView.php");
 require_once("./src/model/PostModel.php");
+require_once('./src/model/PostRepository.php');
 
 class PostController {
 
 	private $postView;
 	private $postModel;
+	private $postRepository;
 
 	public function __construct() {
 
 		$this->postModel = new \model\PostModel();
+		$this->postRepository = new \model\PostRepository();
 		$this->postView = new \view\PostView($this->postModel);
 
 	}
@@ -25,12 +28,21 @@ class PostController {
 
 			switch ($userAction) {
 
+				case \view\PostView::$actionUploadPage:
+					$this->postView->setMessage(\view\PostView::MESSAGE_ERROR_UPLOAD_SUCCESSED);
+					return $this->postView->uploadPageHTML();
+					break;
+
 				case \view\PostView::$actionUpload:
 					return $this->upLoadImage();
 					break;
 
+				case \view\PostView::$actionReturn:
+					return $this->postView->mainPageHTML();
+					break;
+
 				default: 
-					return $this->postView->MainPageHTML();
+					return $this->postView->mainPageHTML();
 			}
 
 		} catch (\Exception $e) {
@@ -45,8 +57,14 @@ class PostController {
 
 		if($this->postModel->isValidImage()) {
 
-			
+			$this->postRepository->saveImage();
+			$this->postView->setMessage(\view\PostView::MESSAGE_ERROR_UPLOAD_SUCCESSED);
+			return $this->postView->uploadPageHTML();
 
+		} else {
+
+			$this->postView->setMessage(\view\PostView::MESSAGE_ERROR_UPLOAD_FAILED);
+			return $this->postView->mainPageHTML();
 		}
 
 	}

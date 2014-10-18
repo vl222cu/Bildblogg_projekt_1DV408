@@ -27,12 +27,18 @@ h1 {
     padding-top: 20px;
 }
 
-#file, #location {
+#contentwrapper {
+    text-align: center;
+    font-size: 26px;
+}
+
+#file, #comment {
     margin-right: 10px;
     margin-left: 5px;
     padding: 5px;
     font-family: "Verdana", "Arial", sans-serif;
     font-size: 11px;
+    font-color: #FFF;
     color: #FFF;
     -moz-box-shadow: 0 0 4px 0 #777;
     -webkit-box-shadow: 0 0 4px 0 #777;
@@ -47,7 +53,23 @@ h1 {
     background: linear-gradient(#575757 5%, #FFF 100%);
 }
 
-#uploadButton {
+::-webkit-input-placeholder { /* WebKit browsers */
+    color: #FFF;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+   color: #FFF;
+   opacity: 1;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+   color: #FFF;
+   opacity: 1;
+}
+:-ms-input-placeholder { /* Internet Explorer 10+ */
+   color: #FFF;
+}
+
+#uploadButton,
+#uploadPageButton {
     width: auto;  
     padding: 3px;
     font-family: "Verdana", "Arial", sans-serif;

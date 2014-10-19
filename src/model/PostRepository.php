@@ -8,8 +8,9 @@ class PostRepository extends base\Repository {
 
 	private static $strImage = "image";
 	private static $strComment = "comment";
-	private static $dateStamp = "dateAdded";
+	private static $dateAdded = "dateAdded";
 	private $imageFolder = "./images/";
+
 
 	 public function __construct() {
 
@@ -27,37 +28,49 @@ class PostRepository extends base\Repository {
 		att bilder med samma namn skrivs över*/
 		$targetImg = time().'.'.array_pop($targetImg);
 
-		//Sparar informationen i databasen
-		$db = $this->connection();
+		//Kontrollerar först om bildfilen sparas till servern innan den sparas i DB
+		if (move_uploaded_file($_FILES['file']['tmp_name'], $this->imageFolder . $targetImg)) {
+			//Sparar informationen i databasen
+			$db = $this->connection();
 
-    	$sql = "INSERT INTO $this->dbTable (" . self::$strImage . ", " . self::$strComment . ") VALUES (?, ?)";
-    	$query = $db->prepare($sql);
-    	$params = array($targetImg, $comment);
-    	$statement = $query->execute($params); 
+	    	$sql = "INSERT INTO $this->dbTable (" . self::$strImage . ", " . self::$strComment . ") VALUES (?, ?)";
+	    	$query = $db->prepare($sql);
+	    	$params = array($targetImg, $comment);
+	    	$statement = $query->execute($params); 
 
-    	if($statement) {
+	    	//Stänger PDO-uppkopplingen till databasen
+	        $this->db = null;
 
-    		$this->saveImageToServer($targetImg);
+	        if ($statement) {
 
-            return true;
+	        	return true;
 
-        } else {
+	        } else {
 
-            return false;
+	        	return false;
+	        }
 
-        } 
+    	} else {
+
+    		return false;
+    	}
 	}
 
-	public function saveImageToServer($targetImg) {
+	public function getAllImagesFromDB() {
 
-		if (move_uploaded_file($_FILES['file']['tmp_name'], $this->imageFolder . $targetImg)) {
- 			
- 			return true;
+		$db = $this->connection();
+		$dateImages = array();
 
-		} else {
- 
-			return false;
+		$sql = "SELECT * FROM $this->dbTable ORDER BY dateAdded DESC, imgID DESC";
+		$query = $db -> prepare($sql);
+		$query -> execute();
+
+		while ($result = $query->fetch(\PDO::FETCH_ASSOC)) {
+
+			$dateImages[$result[self::$dateAdded]][] = $result;
 
 		}
+
+		return $dateImages;
 	}
 }

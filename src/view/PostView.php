@@ -5,23 +5,25 @@ namespace view;
 class PostView {
 
 	private $postModel;
-	private $message = '';
-	private $strComment = 'comment';
-	public static $actionUpload = 'upload';
-	public static $actionUploadPage = 'uploadpage';
+	private $message = "";
+	private static $strComment = "comment";
+	private static $imgFile = "file";
+	private static $imgName = "name";
+	private static $imgType = "type";
+	public static $actionUpload = "upload";
+	public static $actionUploadPage = "uploadpage";
 	public static $actionReturn = 'return';
 
-
-	const MESSAGE_ERROR_UPLOAD_SUCCESSED = 'Uppladdningen lyckades';
-	const MESSAGE_ERROR_UPLOAD_FAILED = 'Uppladdningen misslyckades. Kontrollera att bilden är av format jpg, gif eller png och ej större än 2MB.';
-
+	const MESSAGE_UPLOAD_SUCCESSED = "Uppladdningen lyckades";
+	const MESSAGE_ERROR_UPLOAD_FAILED = "Uppladdningen misslyckades. Kontrollera att bilden är av format jpg, gif eller png och ej större än 2MB";
+	const MESSAGE_ERROR_UPLOAD_TO_SERVER = "Något gick fel! Bilden kunde inte sparas";
 
 	public function __construct(\model\PostModel $postModel) {
 		
 		$this->postModel = $postModel;
 	}
 
-	public function mainPageHTML() {
+/*	public function mainPageHTML() {
 
 		$html = "
 		 	<div id='maincontainer'>
@@ -37,8 +39,7 @@ class PostView {
 		 	</div>";
 
 		return $html;
-
-	}
+	} */
 
 	public function uploadPageHTML() {
 
@@ -51,14 +52,15 @@ class PostView {
 		if($this->getMessage() !== null) {
 
 			$html .= $this->message;
-
 		};
 		
 		$html .= "			
 			<div id='formwrapper'>
 				 		<form action='?upload' method='post' enctype='multipart/form-data'>
-							Välj bild och skriv gärna en kommentar: <input type='file' name='file' id='file' />  
-							<input type='text' name='comment' id='comment' placeholder='Lägg till kommentar' /> 
+							Välj bild och skriv gärna en kommentar: 
+							<p><input type='file' name='file' id='file' /></p>  
+							<p><textarea rows='4' cols='50' name='comment' id='comment' placeholder='Lägg till kommentar' /> 
+							</textarea></p>
 							<input type='submit' name='submit' id='uploadButton' value='Ladda upp' />
 						</form>
 					</div>
@@ -66,7 +68,39 @@ class PostView {
 		 	</div>";
 
 		return $html;
+	}
 
+	public function showAllImagesHTML(array $dbImages) {
+
+		$html = "
+		 	<div id='maincontainer'>
+		 		<div id='content'>
+		 			<h1>Vivis bildblogg</h1>
+			 		<div id='contentwrapper'>
+			 		<form enctype='multipart/form-data' method='post' action='?uploadpage'>
+			 			<input type='submit' name='submit' id='uploadPageButton' value='Posta ett inlägg' />
+			 		</form>";
+
+		foreach ($dbImages as $date => $images) {
+		
+			foreach ($images as $image) {
+
+					$imageURL = $image["image"];
+					$commentText = $image["comment"];
+
+					$html .= "
+						<div class='image'>
+							<a title='photoblog' href='./images//$imageURL'>
+							<img src='./images//$imageURL'/></a>
+							<div class='commentwrapper'>
+								<p>$commentText</p>
+							</div>
+						</div>";
+			}
+
+		}
+
+		return $html;
 	}
 
 	public function getAction() {
@@ -90,46 +124,56 @@ class PostView {
 
 			default:
 				$action = "";
-
 		}
 	}
 
 	public function setMessage($msg) {
 
 		$this->message = '<p>' . $msg . '</p>';
-
 	}
 
 	 public function getMessage() {
 
         return $this->message;
-
     }
 
     public function getImage() {
 
-    	if (isset( $_FILES["file"]) && !empty($_FILES["file"]["name"])) {
+    	if (isset( $_FILES[self::$imgFile]) && !empty($_FILES[self::$imgFile][self::$imgName])) {
 
-    		return $_FILES["file"]["name"];
+    		return $_FILES[self::$imgFile][self::$imgName];
   		}
-  
+
+  		return NULL; 
     }
 
     public function getImageType() {
 
-    	if (isset( $_FILES["file"]["type"]) && !empty( $_FILES["file"]["type"])) {
+    	if (isset( $_FILES[self::$imgFile][self::$imgType]) && !empty( $_FILES[self::$imgFile][self::$imgType])) {
 
-    		return $_FILES["file"]["type"];
+    		return $_FILES[self::$imgFile][self::$imgType];
   		}
-  
+
+  		return NULL;
     }
 
     public function getComment() {
 
-    	if(isset($_POST[$this->strComment])) {
+    	if(isset($_POST[self::$strComment])) {
 
-	        return  $_POST[$this->strComment];
-
+	        return  $_POST[self::$strComment];
 	    }
+
+	    return NULL;
+    }
+
+    public function userHasPressedUploadImage() {
+
+    	if(isset($_POST[self::$actionUploadPage])) {
+
+	        return  true;
+	    }
+
+	    return false;
     }
 }

@@ -1,6 +1,6 @@
 #maincontainer {
-    width: 960px;
-    height: 800px;
+    min-width: 80%;
+    min-height: 800px;
     background: #00ff21;
     margin: auto;
     padding: 20px;
@@ -23,13 +23,11 @@ h1 {
 }
 
 #formwrapper {
-    text-align: center;
     padding-top: 20px;
 }
 
 #contentwrapper {
     text-align: center;
-    font-size: 26px;
 }
 
 #file, #comment {
@@ -71,9 +69,10 @@ h1 {
 #uploadButton,
 #uploadPageButton {
     width: auto;  
-    padding: 3px;
+    padding: 5px;
+    margin: 20px;
     font-family: "Verdana", "Arial", sans-serif;
-    font-size: 11px;
+    font-size: 16px;
     -moz-box-shadow: 0 0 4px 0 #777;
     -webkit-box-shadow: 0 0 4px 0 #777;
     box-shadow: 0 0 4px 0 #777;
@@ -106,4 +105,14 @@ h1 {
         rgb(217,217,217) 41%,
         rgb(255,255,255) 100%
     );
+}
+
+.image {
+    margin: 50px;
+}
+
+.commentwrapper {
+    width:750px;
+    margin-left: 500px;
+    text-align: left;
 }

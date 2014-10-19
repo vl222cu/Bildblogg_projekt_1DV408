@@ -29,7 +29,6 @@ class PostController {
 			switch ($userAction) {
 
 				case \view\PostView::$actionUploadPage:
-					$this->postView->setMessage(\view\PostView::MESSAGE_ERROR_UPLOAD_SUCCESSED);
 					return $this->postView->uploadPageHTML();
 					break;
 
@@ -38,11 +37,11 @@ class PostController {
 					break;
 
 				case \view\PostView::$actionReturn:
-					return $this->postView->mainPageHTML();
+					return $this->showAllImages();
 					break;
 
 				default: 
-					return $this->postView->mainPageHTML();
+					return $this->showAllImages();
 			}
 
 		} catch (\Exception $e) {
@@ -55,12 +54,20 @@ class PostController {
 
 	public function upLoadImage() {
 
-		if($this->postModel->isValidImage($this->postView->getImageType())) {
+		if ($this->postModel->isValidImage($this->postView->getImageType())) {
 
-			$this->postRepository->saveImage($this->postView->getImage(), $this->postView->getComment());
-			$this->postView->setMessage(\view\PostView::MESSAGE_ERROR_UPLOAD_SUCCESSED);
+			if ($this->postRepository->saveImage($this->postView->getImage(), $this->postView->getComment())) {
 
-			return $this->postView->uploadPageHTML();
+				$this->postView->setMessage(\view\PostView::MESSAGE_UPLOAD_SUCCESSED);
+
+				return $this->postView->uploadPageHTML(); 
+
+			} else {
+
+				$this->postView->setMessage(\view\PostView::MESSAGE_ERROR_UPLOAD_TO_SERVER);
+
+				return $this->postView->uploadPageHTML();
+			}
 
 		} else {
 
@@ -69,5 +76,12 @@ class PostController {
 			return $this->postView->uploadPageHTML();
 		}
 
+	}
+
+	public function showAllImages() {
+
+		$images = $this->postRepository->getAllImagesFromDB();
+			
+		return $this->postView->showAllImagesHTML($images);		
 	}
 }

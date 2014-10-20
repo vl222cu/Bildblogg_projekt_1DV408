@@ -9,14 +9,19 @@ class PostView {
 	private static $strComment = "comment";
 	private static $imgFile = "file";
 	private static $imgName = "name";
+	private static $tempName = "tmp_name";
 	private static $imgType = "type";
+	private static $imageURL = "image";
 	public static $actionUpload = "upload";
 	public static $actionUploadPage = "uploadpage";
-	public static $actionReturn = 'return';
+	public static $actionReturn = "return";
+	public static $actionDelete = "delete";
 
 	const MESSAGE_UPLOAD_SUCCESSED = "Uppladdningen lyckades";
-	const MESSAGE_ERROR_UPLOAD_FAILED = "Uppladdningen misslyckades. Kontrollera att bilden är av format jpg, gif eller png och ej större än 2MB";
-	const MESSAGE_ERROR_UPLOAD_TO_SERVER = "Något gick fel! Bilden kunde inte sparas";
+	const MESSAGE_ERROR_UPLOAD_FAILED = "Uppladdningen misslyckades. Kontrollera att bilden är av format jpg, gif eller png och ej större än 2MB med maxbredd och maxlängd på 800px";
+	const MESSAGE_ERROR_UPLOAD_TO_SERVER = "Något gick fel! Det postade inlägget kunde inte sparas";
+	const MESSAGE_DELETE_SUCCESSED = "Det postade inlägget är borttagen";
+	const MESSAGE_DELETE_FAILED = "Något gick fel! Det postade inlägget kunde inte tas bort";
 
 	public function __construct(\model\PostModel $postModel) {
 		
@@ -59,8 +64,7 @@ class PostView {
 				 		<form action='?upload' method='post' enctype='multipart/form-data'>
 							Välj bild och skriv gärna en kommentar: 
 							<p><input type='file' name='file' id='file' /></p>  
-							<p><textarea rows='4' cols='50' name='comment' id='comment' placeholder='Lägg till kommentar' /> 
-							</textarea></p>
+							<p><textarea rows='4' cols='50' name='comment' id='comment' placeholder='Lägg till kommentar' /></textarea></p>
 							<input type='submit' name='submit' id='uploadButton' value='Ladda upp' />
 						</form>
 					</div>
@@ -76,26 +80,40 @@ class PostView {
 		 	<div id='maincontainer'>
 		 		<div id='content'>
 		 			<h1>Vivis bildblogg</h1>
-			 		<div id='contentwrapper'>
-			 		<form enctype='multipart/form-data' method='post' action='?uploadpage'>
-			 			<input type='submit' name='submit' id='uploadPageButton' value='Posta ett inlägg' />
-			 		</form>";
+			 		<div id='contentwrapper'>";
+
+		if($this->getMessage() !== null) {
+
+			$html .= $this->message;
+		};
+
+		$html .= "
+			<form enctype='multipart/form-data' method='post' action='?uploadpage'>
+			 	<input type='submit' name='submit' id='uploadPageButton' value='Posta ett inlägg' />
+			</form>";
 
 		foreach ($dbImages as $date => $images) {
 		
 			foreach ($images as $image) {
 
-					$imageURL = $image["image"];
-					$commentText = $image["comment"];
+				$imageURL = $image["image"];
+				$commentText = $image["comment"];
 
-					$html .= "
-						<div class='image'>
-							<a title='photoblog' href='./images//$imageURL'>
-							<img src='./images//$imageURL'/></a>
-							<div class='commentwrapper'>
-								<p>$commentText</p>
-							</div>
-						</div>";
+				$html .= "
+					<div class='image'>
+						<a title='photoblog' href='./images/$imageURL'>
+						<img src='./images/$imageURL'/></a>
+						<div class='commentwrapper'>
+							<p>$commentText</p>
+						</div>
+						<form action='?delete' enctype='multipart/form-data' method='post'>
+							<input type='hidden' value='$imageURL' name='delete_file' />
+			 				<input type='submit' name='submit' id='deleteButton' value='Radera post' />
+			 			</form>
+			 			<form action='?change' enctype='multipart/form-data' method='post'>
+			 				<input type='submit' name='submit' id='changeButton' value='Ändra post' />
+			 			</form>
+					</div>";
 			}
 
 		}
@@ -119,6 +137,11 @@ class PostView {
 
 			case self::$actionReturn:
 				$action = self::$actionReturn;
+				return $action;
+				break;
+
+			case self::$actionDelete:
+				$action = self::$actionDelete;
 				return $action;
 				break;
 
@@ -147,6 +170,16 @@ class PostView {
   		return NULL; 
     }
 
+    public function getTempImage() {
+
+    	if (isset( $_FILES[self::$imgFile]) && !empty($_FILES[self::$imgFile][self::$tempName])) {
+
+    		return $_FILES[self::$imgFile][self::$tempName];
+  		}
+
+  		return NULL; 
+    }
+
     public function getImageType() {
 
     	if (isset( $_FILES[self::$imgFile][self::$imgType]) && !empty( $_FILES[self::$imgFile][self::$imgType])) {
@@ -166,6 +199,16 @@ class PostView {
 
 	    return NULL;
     }
+
+    public function getImageURL() {
+
+		if (isset($_POST['delete_file'])) {
+
+			return $_POST['delete_file'];
+		}
+
+		return NULL;
+	}
 
     public function userHasPressedUploadImage() {
 

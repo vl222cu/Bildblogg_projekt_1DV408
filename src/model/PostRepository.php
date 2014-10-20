@@ -7,6 +7,7 @@ require_once ('./src/model/PostModel.php');
 
 class PostRepository extends base\Repository {
 
+	private static $postId = "imgID";
 	private static $strImage = "image";
 	private static $strComment = "comment";
 	private static $dateAdded = "dateAdded";
@@ -106,5 +107,28 @@ class PostRepository extends base\Repository {
 
 			return false;
 		}
+	}
+
+	public function getSelectedPostToEdit($imgID) {
+
+		$db = $this->connection();
+		$selectedPost = array();
+
+		$sql = "SELECT * FROM $this->dbTable WHERE " . self::$postId . " = ?";
+		$query = $db->prepare($sql);
+		$params = array($imgID);
+		$query->execute($params); 
+
+		while ($result = $query->fetch(\PDO::FETCH_ASSOC)) {
+
+			array_push($selectedPost, $result);
+
+		}
+		
+		//Stänger PDO-uppkopplingen till databasen
+		$this->db = null;
+
+		return $selectedPost;
+
 	}
 }

@@ -16,9 +16,10 @@ class PostView {
 	public static $actionUploadPage = "uploadpage";
 	public static $actionReturn = "return";
 	public static $actionDelete = "delete";
+	public static $actionChange = "change";
 
-	const MESSAGE_UPLOAD_SUCCESSED = "Uppladdningen lyckades";
-	const MESSAGE_ERROR_UPLOAD_FAILED = "Uppladdningen misslyckades. Kontrollera att bilden är av format jpg, gif eller png och ej större än 2MB med maxbredd och maxlängd på 800px";
+	const MESSAGE_UPLOAD_SUCCESSED = "Uppladdning av inlägg lyckades";
+	const MESSAGE_ERROR_UPLOAD_FAILED = "Uppladdning av inlägg misslyckades. Kontrollera att bilden är av format jpg, gif eller png och ej större än 2MB med maxbredd 800px och maxlängd 800px";
 	const MESSAGE_ERROR_UPLOAD_TO_SERVER = "Något gick fel! Det postade inlägget kunde inte sparas";
 	const MESSAGE_DELETE_SUCCESSED = "Det postade inlägget är borttagen";
 	const MESSAGE_DELETE_FAILED = "Något gick fel! Det postade inlägget kunde inte tas bort";
@@ -89,13 +90,14 @@ class PostView {
 
 		$html .= "
 			<form enctype='multipart/form-data' method='post' action='?uploadpage'>
-			 	<input type='submit' name='submit' id='uploadPageButton' value='Posta ett inlägg' />
+			 	<input type='submit' name='submit' id='uploadPageButton' value='Posta nytt inlägg' />
 			</form>";
 
 		foreach ($dbImages as $date => $images) {
 		
 			foreach ($images as $image) {
 
+				$postId = $image["imgID"];
 				$imageURL = $image["image"];
 				$commentText = $image["comment"];
 
@@ -108,16 +110,50 @@ class PostView {
 						</div>
 						<form action='?delete' enctype='multipart/form-data' method='post'>
 							<input type='hidden' value='$imageURL' name='delete_file' />
-			 				<input type='submit' name='submit' id='deleteButton' value='Radera post' />
+			 				<input type='submit' name='submit' id='deleteButton' value='Radera inlägg' />
 			 			</form>
 			 			<form action='?change' enctype='multipart/form-data' method='post'>
-			 				<input type='submit' name='submit' id='changeButton' value='Ändra post' />
+			 				<input type='hidden' value='$postId' name='update_file' />
+			 				<input type='submit' name='submit' id='changeButton' value='Ändra inlägg' />
 			 			</form>
 					</div>";
 			}
 
 		}
 
+		return $html;
+	}
+
+	public function changePostHTML(array $selectedPost) {
+
+		$selectedPost = $selectedPost[0];
+		$postURL = $selectedPost["image"];
+		$postCommentText = $selectedPost["comment"];
+
+		$html = "
+		 	<div id='maincontainer'>
+		 		<div id='content'>
+		 			<h1>Vivis bildblogg</h1>
+		 			<p><a href='?return'>Tillbaka</a></p>
+			 		<div id='contentwrapper'>";
+
+		if($this->getMessage() !== null) {
+
+			$html .= $this->message;
+		};
+
+		$html .= "
+			<form enctype='multipart/form-data' method='post' action='?confirmchange'>
+			 	<input type='submit' name='submit' id='uploadPageButton' value='Ändra inlägg' />
+			</form>
+			<div class='image'>
+				<a title='photoblog' href='./images/$postURL'>
+				<img src='./images/$postURL'/></a>
+				<div class='commentwrapper'>
+					<p>$postCommentText</p>
+				</div>
+			</div>";
+					
 		return $html;
 	}
 
@@ -142,6 +178,11 @@ class PostView {
 
 			case self::$actionDelete:
 				$action = self::$actionDelete;
+				return $action;
+				break;
+
+			case self::$actionChange:
+				$action = self::$actionChange;
 				return $action;
 				break;
 
@@ -205,6 +246,16 @@ class PostView {
 		if (isset($_POST['delete_file'])) {
 
 			return $_POST['delete_file'];
+		}
+
+		return NULL;
+	}
+
+	 public function getPostId() {
+
+		if (isset($_POST['update_file'])) {
+
+			return $_POST['update_file'];
 		}
 
 		return NULL;

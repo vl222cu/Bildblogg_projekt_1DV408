@@ -20,7 +20,9 @@ class PostController {
 
 	}
 
-	//Kollar vilken funktion som ska anropas beroende på användarens val i vyn 
+	/** 
+	 * Kollar vilken funktion som ska anropas beroende på användarens val i vyn 
+	 */
 	public function doControl() {
 
 		$userAction = $this->postView->getAction();
@@ -45,6 +47,10 @@ class PostController {
 					return $this->deletePost();
 					break;
 
+				case \view\PostView::$actionChange:
+					return $this->changePost();
+					break;
+
 				default: 
 					return $this->showAllPosts();
 			}
@@ -57,10 +63,14 @@ class PostController {
 		} 
 	}
 
-	//Uppladdning av bild och kommentar till server och databas
+	/**
+	 * Uppladdning av bild och kommentar till server och databas
+	 */
 	public function upLoadPost() {
 
-		// Validerar först bildformat och bildstorlek innan bilden sparas
+		/**
+		 * Validerar först bildformat och bildstorlek innan bilden sparas
+		 */
 		if ($this->postModel->isValidImage($this->postView->getImageType()) && $this->postModel->checkImageSize($this->postView->getTempImage())) {
 
 			if ($this->postRepository->saveImage($this->postView->getImage(), $this->postView->getComment())) {
@@ -85,7 +95,9 @@ class PostController {
 
 	}
 
-	//Visar alla bilder och kommentarer som är sparade
+	/**
+	 * Visar alla bilder och kommentarer som är sparade
+	 */
 	public function showAllPosts() {
 
 		$images = $this->postRepository->getAllImagesFromDB();
@@ -93,6 +105,9 @@ class PostController {
 		return $this->postView->showAllImagesHTML($images);		
 	}
 
+	/**
+	 * Tar bort vald bild med tillhöranade kommentar
+	 */
 	public function deletePost() {
 
 		if ($this->postRepository->deletePostFromDB($this->postView->getImageURL())) {
@@ -107,6 +122,14 @@ class PostController {
 
 			return $this->showAllPosts();
 		}
+
+	}
+
+	public function changePost() {
+
+		$selectedPost = $this->postRepository->getSelectedPostToEdit($this->postView->getPostId());
+	
+		return $this->postView->changePostHTML($selectedPost);
 
 	}
 }

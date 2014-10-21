@@ -4,7 +4,7 @@ namespace view;
 
 class HTMLView {
 
-    public function echoHTML($body) {
+    public function errorHTML($body) {
 
         if($body === NULL) {
 

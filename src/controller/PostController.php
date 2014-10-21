@@ -5,6 +5,7 @@ namespace controller;
 require_once("./src/view/PostView.php");
 require_once("./src/model/PostModel.php");
 require_once('./src/model/PostRepository.php');
+require_once('./src/model/ErrorPageView.php');
 
 class PostController {
 
@@ -55,20 +56,27 @@ class PostController {
 					return $this->updatePostedComment();
 					break;
 
+				case \view\PostView::$actionUpdateImagePage:
+					return $this->updatePostedImagePage();
+					break;
+
+				case \view\PostView::$actionUpdateImage:
+					return $this->updatePostedImage();
+					break;
+
 				default: 
 					return $this->showAllPosts();
 			}
 
 		} catch (\Exception $e) {
 
-			throw $e;
-		/*	\view\NavigationView::RedirectToErrorPage();
-			die(); */
+			$this->errorPageView->errorHTML();
+			die(); 
 		} 
 	}
 
 	/**
-	 * Uppladdning av bild och kommentar till server och databas
+	 * Kontrollerar funktion för uppladdning av bild och kommentar till server och databas
 	 */
 	public function upLoadPost() {
 
@@ -129,14 +137,20 @@ class PostController {
 
 	}
 
+	/**
+	 * Returnerar HTML-sida för uppdatering av kommentar
+	 */
 	public function updatePostedCommentPage() {
 
 		$selectedPost = $this->postRepository->getSelectedPostToEdit($this->postView->getPostId());
 
-		return $this->postView->updateCommentHTML($selectedPost);
+		return $this->postView->updateCommentPageHTML($selectedPost);
 
 	}
 
+	/**
+	 * Kontrollerar funktion för uppdatering av kommentar
+	 */
 	public function updatePostedComment() {
 
 		if ($this->postRepository->editSelectedComment($this->postView->getCommentId(), $this->postView->getUpdatedComment())) {
@@ -149,33 +163,56 @@ class PostController {
 
 			$this->postView->setMessage(\view\PostView::MESSAGE_ERROR_UPDATE_COMMENT_FAILED);
 
-			return $this->showAllPosts();
+			$selectedPost = $this->postRepository->getSelectedPostToEdit($this->postView->getCommentId());
+
+			return $this->postView->updateCommentPageHTML($selectedPost);
 
 		}
 	}
 
-/*	public function updatePost() {
+	/**
+	 * Returnerar HTML-sida för uppdatering av bild
+	 */
+	public function updatePostedImagePage() {
 
+		$selectedPost = $this->postRepository->getSelectedPostToEdit($this->postView->getPostId());
+
+		return $this->postView->updateImagePageHTML($selectedPost);
+
+	}
+
+	/**
+	 * Kontrollerar funktion för uppdatering av bild
+	 */
+	public function updatePostedImage() {
+
+		/**
+		 * Validerar först bildformat och bildstorlek innan bilden sparas
+		 */
 		if ($this->postModel->isValidImage($this->postView->getImageType()) && $this->postModel->checkImageSize($this->postView->getTempImage())) {
 
-			if ($this->postRepository->editSelectedPost($this->postView->getPostId(), $this->postView->getImage(), $this->postView->getComment())) {
+			if ($this->postRepository->editSelectedImage($this->postView->getImageId(), $this->postView->getImage())) {
 
-				$this->postView->setMessage(\view\PostView::MESSAGE_UPDATE_SUCCESSED);
+				$this->postView->setMessage(\view\PostView::MESSAGE_UPDATE_IMAGE_SUCCESSED);
 
 				return $this->showAllPosts(); 
 
 			} else {
 
-				$this->postView->setMessage(\view\PostView::MESSAGE_ERROR_UPDATE_TO_SERVER);
+				$this->postView->setMessage(\view\PostView::MESSAGE_ERROR_UPDATE_IMAGE_TO_SERVER);
 
-				return $this->updatePostPage();
+				$selectedPost = $this->postRepository->getSelectedPostToEdit($this->postView->getImageId());
+
+				return $this->postView->updateImagePageHTML($selectedPost);
 			}
 
 		} else {
 
-			$this->postView->setMessage(\view\PostView::MESSAGE_ERROR_UPDATE_FAILED);
+			$this->postView->setMessage(\view\PostView::MESSAGE_ERROR_UPDATE_IMAGE_FAILED);
 
-			return $this->updatePostPage();
-		}
-	} */
+			$selectedPost = $this->postRepository->getSelectedPostToEdit($this->postView->getImageId());
+
+			return $this->postView->updateImagePageHTML($selectedPost);
+		}		
+	}
 }

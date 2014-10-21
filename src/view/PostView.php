@@ -13,47 +13,35 @@ class PostView {
 	private static $imgType = "type";
 	private static $imageURL = "image";
 	private static $updatedComment = "commentupdate";
+
 	public static $actionUpload = "upload";
 	public static $actionUploadPage = "uploadpage";
 	public static $actionReturn = "return";
 	public static $actionDelete = "delete";
 	public static $actionUpdateCommentPage = "updatecommentpage";
 	public static $actionUpdateComment = "updatecomment";
+	public static $actionUpdateImagePage = "updateimagepage";
+	public static $actionUpdateImage = "updateimage";
 
 	const MESSAGE_UPLOAD_SUCCESSED = "Uppladdning av inlägg lyckades";
 	const MESSAGE_ERROR_UPLOAD_FAILED = "Uppladdning av inlägg misslyckades. Kontrollera att bilden är av format jpg, gif eller png och ej större än 2MB med maxbredd 800px och maxlängd 800px";
 	const MESSAGE_ERROR_UPLOAD_TO_SERVER = "Något gick fel! Det postade inlägget kunde inte sparas";
 	const MESSAGE_DELETE_SUCCESSED = "Det postade inlägget är borttagen";
 	const MESSAGE_DELETE_FAILED = "Något gick fel! Det postade inlägget kunde inte tas bort";
-	const MESSAGE_UPDATE_SUCCESSED = "Uppdatering av inlägg lyckades";
-	const MESSAGE_ERROR_UPDATE_TO_SERVER = "Något gick fel! Det gick inte att uppdatera inlägget";
-	const MESSAGE_ERROR_UPDATE_FAILED = "Uppdatering av inlägg misslyckades. Kontrollera att bilden är av format jpg, gif eller png och ej större än 2MB med maxbredd 800px och maxlängd 800px";
 	const MESSAGE_UPDATE_COMMENT_SUCCESSED = "Kommentaren är uppdaterad";
 	const MESSAGE_ERROR_UPDATE_COMMENT_FAILED = "Något gick fel! Kommentaren kunde inte uppdateras";
-
+	const MESSAGE_UPDATE_IMAGE_SUCCESSED = "Bilden är uppdaterad";
+	const MESSAGE_ERROR_UPDATE_IMAGE_TO_SERVER = "Något gick fel! Det gick inte att uppdatera bilden";
+	const MESSAGE_ERROR_UPDATE_IMAGE_FAILED = "Uppdatering av inlägg misslyckades. Kontrollera att bilden är av format jpg, gif eller png och ej större än 2MB med maxbredd 800px och maxlängd 800px";
+	
 	public function __construct(\model\PostModel $postModel) {
 		
 		$this->postModel = $postModel;
 	}
 
-/*	public function mainPageHTML() {
-
-		$html = "
-		 	<div id='maincontainer'>
-		 		<div id='content'>
-		 			<h1>Vivis bildblogg</h1>
-			 		<div id='contentwrapper'>
-			 		<form enctype='multipart/form-data' method='post' action='?uploadpage'>
-			 			<input type='submit' name='submit' id='uploadPageButton' value='Ladda upp bild' />
-			 		</form>
-				 		<p>Här ska alla bilder och kommentarer finnas</p>
-					</div>
-				</div>
-		 	</div>";
-
-		return $html;
-	} */
-
+	/** 
+	 * HTML för uppladdning av inlägg 
+	 */
 	public function uploadPageHTML() {
 
 		$html = "
@@ -82,6 +70,9 @@ class PostView {
 		return $html;
 	}
 
+	/** 
+	 * HTML som visar samtliga inlägg
+	 */
 	public function showAllImagesHTML(array $dbImages) {
 
 		$html = "
@@ -135,43 +126,10 @@ class PostView {
 		return $html;
 	}
 
-/*	public function updatePostHTML(array $selectedPost) {
-
-		$selectedPost = $selectedPost[0];
-		$postId = $selectedPost["imgID"];
-		$postURL = $selectedPost["image"];
-		$postCommentText = $selectedPost["comment"];
-
-		$html = "
-		 	<div id='maincontainer'>
-		 		<div id='content'>
-		 			<h1>Vivis bildblogg</h1>
-		 			<p><a href='?return'>Tillbaka</a></p>
-			 		<div id='contentwrapper'>";
-
-		if($this->getMessage() !== null) {
-
-			$html .= $this->message;
-		};
-
-		$html .= "
-			<div class='image'>
-				<img src='./images/$postURL'/>
-			</div>
-			<div id='formwrapper'>
-				<form action='?update' method='post' enctype='multipart/form-data'>
-					Uppdatera bild och kommentar: 
-					<p><input type='file' name='file' id='file' /></p>  
-					<p><textarea rows='4' cols='80' name='comment' id='comment'/>$postCommentText</textarea></p>
-					<input type='hidden' value='$postId' name='update_file' />
-					<input type='submit' name='submit' id='confirmUpdateButton' value='Uppdatera inlägg' />
-				</form>
-			</div>";
-					
-		return $html;
-	} */
-
-	public function updateCommentHTML(array $selectedPost) {
+	/** 
+	 * HTML för uppdatering av kommentar
+	 */
+	public function updateCommentPageHTML(array $selectedPost) {
 
 		$selectedPost = $selectedPost[0];
 		$postId = $selectedPost["imgID"];
@@ -200,6 +158,45 @@ class PostView {
 					<p><textarea rows='4' cols='80' name='commentupdate' id='commentupdate'/>$postCommentText</textarea></p>
 					<input type='hidden' value='$postId' name='update_comment' />
 					<input type='submit' name='submit' id='updateCommentButton' value='Uppdatera kommentar' />
+				</form>
+			</div>";
+					
+		return $html;
+	}
+
+	/** 
+	 * HTML för uppdatering av bild
+	 */
+	public function updateImagePageHTML(array $selectedPost) {
+
+		$selectedPost = $selectedPost[0];
+		$postId = $selectedPost["imgID"];
+		$postURL = $selectedPost["image"];
+		$postCommentText = $selectedPost["comment"];
+
+		$html = "
+		 	<div id='maincontainer'>
+		 		<div id='content'>
+		 			<h1>Vivis bildblogg</h1>
+		 			<p><a href='?return'>Tillbaka</a></p>
+			 		<div id='contentwrapper'>";
+
+		if($this->getMessage() !== null) {
+
+			$html .= $this->message;
+		};
+
+		$html .= "
+			<div class='image'>
+				<img src='./images/$postURL'/>
+			</div>
+			<div id='formwrapper'>
+				<form action='?updateimage' method='post' enctype='multipart/form-data'>
+					<p>$postCommentText</p>
+					Uppdatera bild: 
+					<p><input type='file' name='file' id='file' /></p>  
+					<input type='hidden' value='$postId' name='update_image' />
+					<input type='submit' name='submit' id='updateImageButton' value='Uppdatera bild' />
 				</form>
 			</div>";
 					
@@ -237,6 +234,16 @@ class PostView {
 
 			case self::$actionUpdateComment:
 				$action = self::$actionUpdateComment;
+				return $action;
+				break;
+
+			case self::$actionUpdateImagePage:
+				$action = self::$actionUpdateImagePage;
+				return $action;
+				break;
+
+			case self::$actionUpdateImage:
+				$action = self::$actionUpdateImage;
 				return $action;
 				break;
 
@@ -330,6 +337,16 @@ class PostView {
 		if (isset($_POST['update_comment'])) {
 
 			return $_POST['update_comment'];
+		}
+
+		return NULL;
+	}
+
+	public function getImageId() {
+
+		if (isset($_POST['update_image'])) {
+
+			return $_POST['update_image'];
 		}
 
 		return NULL;

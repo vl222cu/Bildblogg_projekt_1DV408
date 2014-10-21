@@ -128,18 +128,36 @@ class PostRepository extends base\Repository {
 
 	}
 
-	public function editSelectedPost($imgID, $selectedImg, $selectedComment) {
+	public function editSelectedComment($imgID, $comment) {
+
+		$db = $this->connection();
+
+		$sql = "UPDATE $this->dbTable SET comment = ? WHERE imgID = ?";
+		$query = $db->prepare($sql);
+		$params = array($comment, $imgID);
+		$query->execute($params); 
+		$affectedRow = $query->rowCount();
+			//Stänger PDO-uppkopplingen till databasen
+		$this->db = null;
+
+		if ($affectedRow != "") {
+
+			return true;
+
+		} else {
+
+			return false;
+		}
+	}
+
+	public function editSelectedImage($imgID, $selectedImg) {
 
 		$oldPost = $this->getSelectedPostToEdit($imgID);
 		$oldPost = $oldPost[0];
 		$oldImg = $oldPost[self::$strImage];
-		var_dump($oldImg);
+		
+		@unlink($this->imageFolder . $oldImg);
 
-		if ($oldImg !== $selectedImg) {
-
-			@unlink($this->imageFolder . $old_Imgfile);
-		}
-	
 		//Katalog i servern där bilderna sparas
 		$targetImg = $this->imageFolder;
 		$targetImg = $targetImg . basename($selectedImg);
@@ -154,44 +172,22 @@ class PostRepository extends base\Repository {
 			//Sparar informationen i databasen
 			$db = $this->connection();
 
-			$sql = "UPDATE $this->dbTable SET image = ?, comment = ? WHERE imgID = ?";
+			$sql = "UPDATE $this->dbTable SET image = ? WHERE imgID = ?";
 			$query = $db->prepare($sql);
-			$params = array($imgID, $targetImg, $comment);
-			$statement = $query->execute($params); 
-
+			$params = array($targetImg, $imgID);
+			$query->execute($params); 
+			$affectedRow = $query->rowCount();
 			//Stänger PDO-uppkopplingen till databasen
 			$this->db = null;
 
-			if ($statement) {
+			if ($affectedRow != "") {
 
-			    return true;
+				return true;
 
 			} else {
 
-			    return false;
+				return false;
 			}
-		}
-	}
-
-	public function editSelectedComment($imgID, $comment) {
-		var_dump($imgID);
-		$db = $this->connection();
-
-		$sql = "UPDATE $this->dbTable SET comment = ? WHERE imgID = ?";
-		$query = $db->prepare($sql);
-		$params = array($comment, $imgID);
-		$query->execute($params); 
-		$affected_row = $query->rowCount();
-			//Stänger PDO-uppkopplingen till databasen
-		$this->db = null;
-
-		if ($affected_row != "") {
-
-			return true;
-
-		} else {
-
-			return false;
 		}
 	}
 }

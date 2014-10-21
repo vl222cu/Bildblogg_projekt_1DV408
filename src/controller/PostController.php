@@ -47,8 +47,12 @@ class PostController {
 					return $this->deletePost();
 					break;
 
-				case \view\PostView::$actionChange:
-					return $this->changePost();
+				case \view\PostView::$actionUpdateCommentPage:
+					return $this->updatePostedCommentPage();
+					break;
+
+				case \view\PostView::$actionUpdateComment:
+					return $this->updatePostedComment();
 					break;
 
 				default: 
@@ -125,11 +129,53 @@ class PostController {
 
 	}
 
-	public function changePost() {
+	public function updatePostedCommentPage() {
 
 		$selectedPost = $this->postRepository->getSelectedPostToEdit($this->postView->getPostId());
-	
-		return $this->postView->changePostHTML($selectedPost);
+
+		return $this->postView->updateCommentHTML($selectedPost);
 
 	}
+
+	public function updatePostedComment() {
+
+		if ($this->postRepository->editSelectedComment($this->postView->getCommentId(), $this->postView->getUpdatedComment())) {
+
+			$this->postView->setMessage(\view\PostView::MESSAGE_UPDATE_COMMENT_SUCCESSED);
+
+			return $this->showAllPosts(); 
+
+		} else {
+
+			$this->postView->setMessage(\view\PostView::MESSAGE_ERROR_UPDATE_COMMENT_FAILED);
+
+			return $this->showAllPosts();
+
+		}
+	}
+
+/*	public function updatePost() {
+
+		if ($this->postModel->isValidImage($this->postView->getImageType()) && $this->postModel->checkImageSize($this->postView->getTempImage())) {
+
+			if ($this->postRepository->editSelectedPost($this->postView->getPostId(), $this->postView->getImage(), $this->postView->getComment())) {
+
+				$this->postView->setMessage(\view\PostView::MESSAGE_UPDATE_SUCCESSED);
+
+				return $this->showAllPosts(); 
+
+			} else {
+
+				$this->postView->setMessage(\view\PostView::MESSAGE_ERROR_UPDATE_TO_SERVER);
+
+				return $this->updatePostPage();
+			}
+
+		} else {
+
+			$this->postView->setMessage(\view\PostView::MESSAGE_ERROR_UPDATE_FAILED);
+
+			return $this->updatePostPage();
+		}
+	} */
 }

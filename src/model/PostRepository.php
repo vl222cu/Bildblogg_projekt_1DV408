@@ -35,36 +35,32 @@ class PostRepository extends base\Repository {
 		att bilder med samma namn skrivs över*/
 		$targetImg = time().'.'.array_pop($targetImg);
 
-	//	if ($this->postModel->checkImageSize($_FILES['file']['tmp_name'])) {
-			//Kontrollerar först om bildfilen sparas till servern innan den sparas i DB
-			if (move_uploaded_file(\model\PostModel::$imgInfo, $this->imageFolder . $targetImg)) {
-				//Sparar informationen i databasen
-				$db = $this->connection();
+		//Kontrollerar först om bildfilen sparas till servern innan den sparas i DB
+		if (move_uploaded_file(\model\PostModel::$imgInfo, $this->imageFolder . $targetImg)) {
+			//Sparar informationen i databasen
+			$db = $this->connection();
 
-		    	$sql = "INSERT INTO $this->dbTable (" . self::$strImage . ", " . self::$strComment . ") VALUES (?, ?)";
-		    	$query = $db->prepare($sql);
-		    	$params = array($targetImg, $comment);
-		    	$statement = $query->execute($params); 
+		    $sql = "INSERT INTO $this->dbTable (" . self::$strImage . ", " . self::$strComment . ") VALUES (?, ?)";
+		    $query = $db->prepare($sql);
+		    $params = array($targetImg, $comment);
+		    $statement = $query->execute($params); 
 
-		    	//Stänger PDO-uppkopplingen till databasen
-		        $this->db = null;
+		   	//Stänger PDO-uppkopplingen till databasen
+		    $this->db = null;
 
-		        if ($statement) {
+		    if ($statement) {
 
-		        	return true;
+		        return true;
 
-		        } else {
+		    } else {
 
-		        	return false;
-		        }
+		        return false;
+		    }
 
-	    	} else {
+	    } else {
 
-	    		return false;
-	    	}
-
-	//    	return false;
-	//    }	
+	    	return false;
+	    }
 	}
 
 	public function getAllImagesFromDB() {
@@ -93,7 +89,7 @@ class PostRepository extends base\Repository {
 
 			$db = $this->connection();
 
-			$sql = "DELETE FROM $this->dbTable WHERE image = ?";
+			$sql = "DELETE FROM $this->dbTable WHERE " . self::$strImage . " = ?";
 			$query = $db->prepare($sql);
 			$params = array($displayedImg);
 			$statement = $query->execute($params); 
@@ -124,11 +120,78 @@ class PostRepository extends base\Repository {
 			array_push($selectedPost, $result);
 
 		}
-		
+
 		//Stänger PDO-uppkopplingen till databasen
 		$this->db = null;
 
 		return $selectedPost;
 
+	}
+
+	public function editSelectedPost($imgID, $selectedImg, $selectedComment) {
+
+		$oldPost = $this->getSelectedPostToEdit($imgID);
+		$oldPost = $oldPost[0];
+		$oldImg = $oldPost[self::$strImage];
+		var_dump($oldImg);
+
+		if ($oldImg !== $selectedImg) {
+
+			@unlink($this->imageFolder . $old_Imgfile);
+		}
+	
+		//Katalog i servern där bilderna sparas
+		$targetImg = $this->imageFolder;
+		$targetImg = $targetImg . basename($selectedImg);
+		$targetImg = explode(".", $targetImg);
+
+		/*Använder tid som namn för bildfilen för att förhindra
+		att bilder med samma namn skrivs över*/
+		$targetImg = time().'.'.array_pop($targetImg);
+
+		//Kontrollerar först om bildfilen sparas till servern innan den sparas i DB
+		if (move_uploaded_file(\model\PostModel::$imgInfo, $this->imageFolder . $targetImg)) {
+			//Sparar informationen i databasen
+			$db = $this->connection();
+
+			$sql = "UPDATE $this->dbTable SET image = ?, comment = ? WHERE imgID = ?";
+			$query = $db->prepare($sql);
+			$params = array($imgID, $targetImg, $comment);
+			$statement = $query->execute($params); 
+
+			//Stänger PDO-uppkopplingen till databasen
+			$this->db = null;
+
+			if ($statement) {
+
+			    return true;
+
+			} else {
+
+			    return false;
+			}
+		}
+	}
+
+	public function editSelectedComment($imgID, $comment) {
+		var_dump($imgID);
+		$db = $this->connection();
+
+		$sql = "UPDATE $this->dbTable SET comment = ? WHERE imgID = ?";
+		$query = $db->prepare($sql);
+		$params = array($comment, $imgID);
+		$query->execute($params); 
+		$affected_row = $query->rowCount();
+			//Stänger PDO-uppkopplingen till databasen
+		$this->db = null;
+
+		if ($affected_row != "") {
+
+			return true;
+
+		} else {
+
+			return false;
+		}
 	}
 }

@@ -12,17 +12,24 @@ class PostView {
 	private static $tempName = "tmp_name";
 	private static $imgType = "type";
 	private static $imageURL = "image";
+	private static $updatedComment = "commentupdate";
 	public static $actionUpload = "upload";
 	public static $actionUploadPage = "uploadpage";
 	public static $actionReturn = "return";
 	public static $actionDelete = "delete";
-	public static $actionChange = "change";
+	public static $actionUpdateCommentPage = "updatecommentpage";
+	public static $actionUpdateComment = "updatecomment";
 
 	const MESSAGE_UPLOAD_SUCCESSED = "Uppladdning av inlägg lyckades";
 	const MESSAGE_ERROR_UPLOAD_FAILED = "Uppladdning av inlägg misslyckades. Kontrollera att bilden är av format jpg, gif eller png och ej större än 2MB med maxbredd 800px och maxlängd 800px";
 	const MESSAGE_ERROR_UPLOAD_TO_SERVER = "Något gick fel! Det postade inlägget kunde inte sparas";
 	const MESSAGE_DELETE_SUCCESSED = "Det postade inlägget är borttagen";
 	const MESSAGE_DELETE_FAILED = "Något gick fel! Det postade inlägget kunde inte tas bort";
+	const MESSAGE_UPDATE_SUCCESSED = "Uppdatering av inlägg lyckades";
+	const MESSAGE_ERROR_UPDATE_TO_SERVER = "Något gick fel! Det gick inte att uppdatera inlägget";
+	const MESSAGE_ERROR_UPDATE_FAILED = "Uppdatering av inlägg misslyckades. Kontrollera att bilden är av format jpg, gif eller png och ej större än 2MB med maxbredd 800px och maxlängd 800px";
+	const MESSAGE_UPDATE_COMMENT_SUCCESSED = "Kommentaren är uppdaterad";
+	const MESSAGE_ERROR_UPDATE_COMMENT_FAILED = "Något gick fel! Kommentaren kunde inte uppdateras";
 
 	public function __construct(\model\PostModel $postModel) {
 		
@@ -65,7 +72,7 @@ class PostView {
 				 		<form action='?upload' method='post' enctype='multipart/form-data'>
 							Välj bild och skriv gärna en kommentar: 
 							<p><input type='file' name='file' id='file' /></p>  
-							<p><textarea rows='4' cols='50' name='comment' id='comment' placeholder='Lägg till kommentar' /></textarea></p>
+							<p><textarea rows='10' cols='80' name='comment' id='comment' placeholder='Lägg till kommentar' /></textarea></p>
 							<input type='submit' name='submit' id='uploadButton' value='Ladda upp' />
 						</form>
 					</div>
@@ -112,9 +119,13 @@ class PostView {
 							<input type='hidden' value='$imageURL' name='delete_file' />
 			 				<input type='submit' name='submit' id='deleteButton' value='Radera inlägg' />
 			 			</form>
-			 			<form action='?change' enctype='multipart/form-data' method='post'>
+			 			<form action='?updatecommentpage' enctype='multipart/form-data' method='post'>
 			 				<input type='hidden' value='$postId' name='update_file' />
-			 				<input type='submit' name='submit' id='changeButton' value='Ändra inlägg' />
+			 				<input type='submit' name='submit' id='updateCommentButton' value='Ändra kommentar' />
+			 			</form>
+			 			<form action='?updateimagepage' enctype='multipart/form-data' method='post'>
+			 				<input type='hidden' value='$postId' name='update_file' />
+			 				<input type='submit' name='submit' id='updateImageButton' value='Ändra bild' />
 			 			</form>
 					</div>";
 			}
@@ -124,9 +135,10 @@ class PostView {
 		return $html;
 	}
 
-	public function changePostHTML(array $selectedPost) {
+/*	public function updatePostHTML(array $selectedPost) {
 
 		$selectedPost = $selectedPost[0];
+		$postId = $selectedPost["imgID"];
 		$postURL = $selectedPost["image"];
 		$postCommentText = $selectedPost["comment"];
 
@@ -143,15 +155,52 @@ class PostView {
 		};
 
 		$html .= "
-			<form enctype='multipart/form-data' method='post' action='?confirmchange'>
-			 	<input type='submit' name='submit' id='uploadPageButton' value='Ändra inlägg' />
-			</form>
 			<div class='image'>
-				<a title='photoblog' href='./images/$postURL'>
-				<img src='./images/$postURL'/></a>
-				<div class='commentwrapper'>
-					<p>$postCommentText</p>
-				</div>
+				<img src='./images/$postURL'/>
+			</div>
+			<div id='formwrapper'>
+				<form action='?update' method='post' enctype='multipart/form-data'>
+					Uppdatera bild och kommentar: 
+					<p><input type='file' name='file' id='file' /></p>  
+					<p><textarea rows='4' cols='80' name='comment' id='comment'/>$postCommentText</textarea></p>
+					<input type='hidden' value='$postId' name='update_file' />
+					<input type='submit' name='submit' id='confirmUpdateButton' value='Uppdatera inlägg' />
+				</form>
+			</div>";
+					
+		return $html;
+	} */
+
+	public function updateCommentHTML(array $selectedPost) {
+
+		$selectedPost = $selectedPost[0];
+		$postId = $selectedPost["imgID"];
+		$postURL = $selectedPost["image"];
+		$postCommentText = $selectedPost["comment"];
+
+		$html = "
+		 	<div id='maincontainer'>
+		 		<div id='content'>
+		 			<h1>Vivis bildblogg</h1>
+		 			<p><a href='?return'>Tillbaka</a></p>
+			 		<div id='contentwrapper'>";
+
+		if($this->getMessage() !== null) {
+
+			$html .= $this->message;
+		};
+
+		$html .= "
+			<div class='image'>
+				<img src='./images/$postURL'/>
+			</div>
+			<div id='formwrapper'>
+				<form action='?updatecomment' method='post' enctype='multipart/form-data'>
+					Uppdatera kommentar:  
+					<p><textarea rows='4' cols='80' name='commentupdate' id='commentupdate'/>$postCommentText</textarea></p>
+					<input type='hidden' value='$postId' name='update_comment' />
+					<input type='submit' name='submit' id='updateCommentButton' value='Uppdatera kommentar' />
+				</form>
 			</div>";
 					
 		return $html;
@@ -181,8 +230,13 @@ class PostView {
 				return $action;
 				break;
 
-			case self::$actionChange:
-				$action = self::$actionChange;
+			case self::$actionUpdateCommentPage:
+				$action = self::$actionUpdateCommentPage;
+				return $action;
+				break;
+
+			case self::$actionUpdateComment:
+				$action = self::$actionUpdateComment;
 				return $action;
 				break;
 
@@ -241,6 +295,16 @@ class PostView {
 	    return NULL;
     }
 
+    public function getUpdatedComment() {
+
+    	if(isset($_POST[self::$updatedComment])) {
+
+	        return  $_POST[self::$updatedComment];
+	    }
+
+	    return NULL;
+    }
+
     public function getImageURL() {
 
 		if (isset($_POST['delete_file'])) {
@@ -256,6 +320,16 @@ class PostView {
 		if (isset($_POST['update_file'])) {
 
 			return $_POST['update_file'];
+		}
+
+		return NULL;
+	}
+
+	public function getCommentId() {
+
+		if (isset($_POST['update_comment'])) {
+
+			return $_POST['update_comment'];
 		}
 
 		return NULL;

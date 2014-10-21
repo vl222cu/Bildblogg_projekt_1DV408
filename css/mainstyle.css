@@ -69,7 +69,8 @@ h1 {
 #uploadButton,
 #uploadPageButton,
 #changeButton,
-#deleteButton {
+#deleteButton,
+#confirmUpdateButton {
     width: auto;  
     padding: 5px;
     margin: 20px;
@@ -114,6 +115,6 @@ h1 {
 }
 
 .commentwrapper {
-    width:auto;
-    text-align: left;
+    width: auto;
+    text-align: center;
 }

@@ -4,7 +4,7 @@ namespace view;
 
 class HTMLView {
 
-    public function errorHTML($body) {
+    public function echoHTML($body) {
 
         if($body === NULL) {
 
@@ -18,9 +18,11 @@ class HTMLView {
                 <title>Project photoblog vl222cu</title>
                 <link rel='stylesheet' href='css/mainstyle.css' media='screen'>
                 <meta http-equiv='content-type' content='text/html; charset=utf-8' />
+                <script src='//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'></script>
                 </head>
                 <body>
                     $body
+                <script type='text/javascript' src='Message.js'></script>
                 </body>
                 </html>
         ";

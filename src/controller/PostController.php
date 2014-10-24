@@ -5,19 +5,21 @@ namespace controller;
 require_once("./src/view/PostView.php");
 require_once("./src/model/PostModel.php");
 require_once('./src/model/PostRepository.php');
-require_once('./src/model/ErrorPageView.php');
+require_once('./src/view/ErrorPageView.php');
 
 class PostController {
 
 	private $postView;
 	private $postModel;
 	private $postRepository;
+	private $errorPageView;
 
 	public function __construct() {
 
 		$this->postModel = new \model\PostModel();
 		$this->postRepository = new \model\PostRepository();
 		$this->postView = new \view\PostView($this->postModel);
+		$this->errorPageView = new \view\ErrorPageView();
 
 	}
 
@@ -80,16 +82,18 @@ class PostController {
 	 */
 	public function upLoadPost() {
 
+	//	$clientIdentifier = $this->postView->getClientIdentifier();
 		/**
 		 * Validerar först bildformat och bildstorlek innan bilden sparas
 		 */
 		if ($this->postModel->isValidImage($this->postView->getImageType()) && $this->postModel->checkImageSize($this->postView->getTempImage())) {
 
-			if ($this->postRepository->saveImage($this->postView->getImage(), $this->postView->getComment())) {
+			if ($this->postRepository->saveImage($this->postView->getPostedBy(), $this->postView->getImage(), $this->postView->getComment())) {
 
+			//	$this->postModel->setClientIdentifier($clientIdentifier);
 				$this->postView->setMessage(\view\PostView::MESSAGE_UPLOAD_SUCCESSED);
 
-				return $this->postView->uploadPageHTML(); 
+				return $this->showAllPosts(); 
 
 			} else {
 
@@ -122,19 +126,27 @@ class PostController {
 	 */
 	public function deletePost() {
 
-		if ($this->postRepository->deletePostFromDB($this->postView->getImageURL())) {
+		if ($this->postModel->getTargetImgId() || $this->postModel->getTargetCommentId()) {
 
-			$this->postView->setMessage(\view\PostView::MESSAGE_DELETE_SUCCESSED);
+			if ($this->postRepository->deletePostFromDB($this->postView->getImageURL())) {
 
-			return $this->showAllPosts();
+				$this->postView->setMessage(\view\PostView::MESSAGE_DELETE_SUCCESSED);
+
+				return $this->showAllPosts();
+
+			} else {
+
+				$this->postView->setMessage(\view\PostView::MESSAGE_DELETE_FAILED);
+
+				return $this->showAllPosts();
+			}
 
 		} else {
 
-			$this->postView->setMessage(\view\PostView::MESSAGE_DELETE_FAILED);
+			$this->postView->setMessage(\view\PostView::MESSAGE_DELETE_NOT_ALLOWED);
 
 			return $this->showAllPosts();
 		}
-
 	}
 
 	/**
@@ -142,10 +154,19 @@ class PostController {
 	 */
 	public function updatePostedCommentPage() {
 
-		$selectedPost = $this->postRepository->getSelectedPostToEdit($this->postView->getPostId());
+		if ($this->postModel->getTargetImgId() || $this->postModel->getTargetCommentId()) {	
 
-		return $this->postView->updateCommentPageHTML($selectedPost);
+			$selectedPost = $this->postRepository->getSelectedPostToEdit($this->postView->getPostId());
 
+			return $this->postView->updateCommentPageHTML($selectedPost);
+
+		} else {
+
+			$this->postView->setMessage(\view\PostView::MESSAGE_UPDATE_COMMENT_NOT_ALLOWED);
+
+			return $this->showAllPosts();
+
+		}
 	}
 
 	/**
@@ -166,7 +187,6 @@ class PostController {
 			$selectedPost = $this->postRepository->getSelectedPostToEdit($this->postView->getCommentId());
 
 			return $this->postView->updateCommentPageHTML($selectedPost);
-
 		}
 	}
 
@@ -175,9 +195,18 @@ class PostController {
 	 */
 	public function updatePostedImagePage() {
 
-		$selectedPost = $this->postRepository->getSelectedPostToEdit($this->postView->getPostId());
+		if ($this->postModel->getTargetImgId() || $this->postModel->getTargetCommentId()) {	
+		
+			$selectedPost = $this->postRepository->getSelectedPostToEdit($this->postView->getPostId());
 
-		return $this->postView->updateImagePageHTML($selectedPost);
+			return $this->postView->updateImagePageHTML($selectedPost);
+
+		} else {
+
+			$this->postView->setMessage(\view\PostView::MESSAGE_UPDATE_IMAGE_NOT_ALLOWED);
+
+			return $this->showAllPosts();
+		}
 
 	}
 

@@ -8,6 +8,7 @@ require_once ('./src/model/PostModel.php');
 class PostRepository extends base\Repository {
 
 	private static $postId = "imgID";
+	private static $strPostedBy = "name";
 	private static $strImage = "image";
 	private static $strComment = "comment";
 	private static $dateAdded = "dateAdded";
@@ -24,7 +25,7 @@ class PostRepository extends base\Repository {
 
     }
 
-	public function saveImage($img, $comment) {
+	public function saveImage($postedBy, $img, $comment) {
 
 		//Katalog i servern där bilderna sparas
 		$targetImg = $this->imageFolder;
@@ -40,15 +41,18 @@ class PostRepository extends base\Repository {
 			//Sparar informationen i databasen
 			$db = $this->connection();
 
-		    $sql = "INSERT INTO $this->dbTable (" . self::$strImage . ", " . self::$strComment . ") VALUES (?, ?)";
+		    $sql = "INSERT INTO $this->dbTable (" . self::$strPostedBy . ", " . self::$strImage . ", " . self::$strComment . ") VALUES (?, ?, ?)";
 		    $query = $db->prepare($sql);
-		    $params = array($targetImg, $comment);
+		    $params = array($postedBy, $targetImg, $comment);
 		    $statement = $query->execute($params); 
 
 		   	//Stänger PDO-uppkopplingen till databasen
 		    $this->db = null;
 
 		    if ($statement) {
+
+		    	$_SESSION['targetImgID'] = $targetImg;
+		    	$_SESSION['targetCommentID'] = $comment;
 
 		        return true;
 

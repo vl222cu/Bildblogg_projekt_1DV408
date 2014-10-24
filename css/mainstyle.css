@@ -22,6 +22,16 @@ h1 {
     text-shadow: 2px 2px 0 #FFF;
 }
 
+.msgstatus {
+    text-align: center;
+    color: #4EB00E;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.return {
+    color: #FFF;
+}
+
 #formwrapper {
     padding-top: 20px;
 }
@@ -30,7 +40,9 @@ h1 {
     text-align: center;
 }
 
-#file, #comment {
+#file, 
+#comment,
+#postedby {
     margin-right: 10px;
     margin-left: 5px;
     padding: 5px;
@@ -70,7 +82,8 @@ h1 {
 #uploadPageButton,
 #changeButton,
 #deleteButton,
-#confirmUpdateButton {
+#updateImageButton,
+#updateCommentButton {
     width: auto;  
     padding: 5px;
     margin: 20px;
@@ -108,6 +121,11 @@ h1 {
         rgb(217,217,217) 41%,
         rgb(255,255,255) 100%
     );
+}
+
+#buttontable {
+    margin-left: auto; 
+    margin-right: auto;
 }
 
 .image {

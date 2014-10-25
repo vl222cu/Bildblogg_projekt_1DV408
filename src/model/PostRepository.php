@@ -27,18 +27,26 @@ class PostRepository extends base\Repository {
 
 	public function saveImage($postedBy, $img, $comment) {
 
-		//Katalog i servern där bilderna sparas
+		/**
+		 *	Katalog i servern där bilderna sparas
+		 */
 		$targetImg = $this->imageFolder;
 		$targetImg = $targetImg . basename($img);
 		$targetImg = explode(".", $targetImg);
 
-		/*Använder tid som namn för bildfilen för att förhindra
-		att bilder med samma namn skrivs över*/
+		/** Använder tid som namn för bildfilen för att förhindra
+		 *	att bilder med samma namn skrivs över
+		 */
 		$targetImg = time().'.'.array_pop($targetImg);
 
-		//Kontrollerar först om bildfilen sparas till servern innan den sparas i DB
+		/**
+		* Kontrollerar först om bildfilen sparas till servern innan den sparas i DB
+		*/
 		if (move_uploaded_file(\model\PostModel::$imgInfo, $this->imageFolder . $targetImg)) {
-			//Sparar informationen i databasen
+
+			/**
+			* Sparar informationen i databasen
+			*/
 			$db = $this->connection();
 
 		    $sql = "INSERT INTO $this->dbTable (" . self::$strPostedBy . ", " . self::$strImage . ", " . self::$strComment . ") VALUES (?, ?, ?)";
@@ -46,7 +54,9 @@ class PostRepository extends base\Repository {
 		    $params = array($postedBy, $targetImg, $comment);
 		    $statement = $query->execute($params); 
 
-		   	//Stänger PDO-uppkopplingen till databasen
+		   	/**
+		   	* Stänger PDO-uppkopplingen till databasen
+		   	*/
 		    $this->db = null;
 
 		    if ($statement) {
@@ -67,26 +77,35 @@ class PostRepository extends base\Repository {
 	    }
 	}
 
+	/**
+	 * Hämtar alla sparade bilder från databasen
+	 */
 	public function getAllImagesFromDB() {
 
 		$db = $this->connection();
 		$dateImages = array();
 
 		$sql = "SELECT * FROM $this->dbTable ORDER BY dateAdded DESC, imgID DESC";
-		$query = $db -> prepare($sql);
-		$query -> execute();
+		$query = $db->prepare($sql);
+		$query->execute();
 
 		while ($result = $query->fetch(\PDO::FETCH_ASSOC)) {
 
 			$dateImages[$result[self::$dateAdded]][] = $result;
 
 		}
-		//Stänger PDO-uppkopplingen till databasen
+		
+		/**
+		 * Stänger PDO-uppkopplingen till databasen
+		 */
 		$this->db = null;
 
 		return $dateImages;
 	}
 
+	/**
+	 * Raderar vald bild från databasen och servern
+	 */
 	public function deletePostFromDB($displayedImg) {
 
 		if (@unlink($this->imageFolder . $displayedImg)) {
@@ -98,7 +117,9 @@ class PostRepository extends base\Repository {
 			$params = array($displayedImg);
 			$statement = $query->execute($params); 
 
-			//Stänger PDO-uppkopplingen till databasen
+			/**
+		 	* Stänger PDO-uppkopplingen till databasen
+		 	*/
 		    $this->db = null;
 
 			return true;
@@ -109,6 +130,9 @@ class PostRepository extends base\Repository {
 		}
 	}
 
+	/**
+	 * Hämtar den valda bilden för uppdatering
+	 */
 	public function getSelectedPostToEdit($imgID) {
 
 		$db = $this->connection();
@@ -125,13 +149,18 @@ class PostRepository extends base\Repository {
 
 		}
 
-		//Stänger PDO-uppkopplingen till databasen
+		/**
+		 * Stänger PDO-uppkopplingen till databasen
+		 */
 		$this->db = null;
 
 		return $selectedPost;
 
 	}
 
+	/**
+	 * Uppdaterar kommentar i databasen
+	 */
 	public function editSelectedComment($imgID, $comment) {
 
 		$db = $this->connection();
@@ -141,7 +170,10 @@ class PostRepository extends base\Repository {
 		$params = array($comment, $imgID);
 		$query->execute($params); 
 		$affectedRow = $query->rowCount();
-			//Stänger PDO-uppkopplingen till databasen
+		
+		/**
+		 * Stänger PDO-uppkopplingen till databasen
+		 */
 		$this->db = null;
 
 		if ($affectedRow != "") {
@@ -154,6 +186,9 @@ class PostRepository extends base\Repository {
 		}
 	}
 
+	/**
+	 * Uppdaterar bild i databasen och i servern
+	 */
 	public function editSelectedImage($imgID, $selectedImg) {
 
 		$oldPost = $this->getSelectedPostToEdit($imgID);
@@ -162,18 +197,26 @@ class PostRepository extends base\Repository {
 		
 		@unlink($this->imageFolder . $oldImg);
 
-		//Katalog i servern där bilderna sparas
+		/**
+		 *Katalog i servern där bilderna sparas
+		 */
 		$targetImg = $this->imageFolder;
 		$targetImg = $targetImg . basename($selectedImg);
 		$targetImg = explode(".", $targetImg);
 
-		/*Använder tid som namn för bildfilen för att förhindra
-		att bilder med samma namn skrivs över*/
+		/**Använder tid som namn för bildfilen för att förhindra
+		 * att bilder med samma namn skrivs över
+		 */
 		$targetImg = time().'.'.array_pop($targetImg);
 
-		//Kontrollerar först om bildfilen sparas till servern innan den sparas i DB
+		/**
+		 * Kontrollerar först om bildfilen sparas till servern innan den sparas i DB
+		 */
 		if (move_uploaded_file(\model\PostModel::$imgInfo, $this->imageFolder . $targetImg)) {
-			//Sparar informationen i databasen
+			
+			/**
+			 * Sparar informationen i databasen
+			 */
 			$db = $this->connection();
 
 			$sql = "UPDATE $this->dbTable SET image = ? WHERE imgID = ?";
@@ -181,7 +224,10 @@ class PostRepository extends base\Repository {
 			$params = array($targetImg, $imgID);
 			$query->execute($params); 
 			$affectedRow = $query->rowCount();
-			//Stänger PDO-uppkopplingen till databasen
+			
+			/**
+			* Stänger PDO-uppkopplingen till databasen
+			*/
 			$this->db = null;
 
 			if ($affectedRow != "") {

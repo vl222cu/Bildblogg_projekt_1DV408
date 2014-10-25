@@ -4,6 +4,9 @@ namespace view;
 
 class ErrorPageView {
 
+    /**
+     * Returnerar error HTML
+     */
     public function errorHTML() {
 
         $html = "

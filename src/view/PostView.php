@@ -27,6 +27,7 @@ class PostView {
 	public static $actionUpdateComment = "updatecomment";
 	public static $actionUpdateImagePage = "updateimagepage";
 	public static $actionUpdateImage = "updateimage";
+	public static $actionLoginPage = "loginpage";
 
 	const MESSAGE_UPLOAD_SUCCESSED = "Uppladdning av inlägg lyckades";
 	const MESSAGE_ERROR_UPLOAD_FAILED = "Uppladdning av inlägg misslyckades. Kontrollera att bilden är av format jpg, gif eller png och ej större än 2MB med maxbredd 800px och maxlängd 800px";
@@ -45,6 +46,7 @@ class PostView {
 	public function __construct(\model\PostModel $postModel) {
 		
 		$this->postModel = $postModel;
+
 	}
 
 	/** 
@@ -69,7 +71,7 @@ class PostView {
 							Välj bild och skriv gärna en kommentar: 
 							<p><input type='file' name='file' id='file' /></p>  
 							<p><textarea rows='10' cols='80' name='comment' id='comment' placeholder='Lägg till kommentar' /></textarea></p>
-							<p><input type='text' name='postedby' id='postedby' placeholder='Fyll i ditt namn här' required/></p>
+							<p><input type='text' name='postedby' id='postedby' placeholder='Fyll i ditt namn här' /></p>
 							<input type='submit' name='submit' id='uploadButton' value='Ladda upp' />
 						</form>
 					</div>
@@ -77,7 +79,7 @@ class PostView {
 		 	</div>";
 
 		return $html;
-	}
+	} 
 
 	/** 
 	 * HTML som visar samtliga inlägg
@@ -141,11 +143,10 @@ class PostView {
 			 			</table>
 					</div>";
 			}
-
 		}
 
 		return $html;
-	} 
+	}
 
 	/** 
 	 * HTML för uppdatering av kommentar
@@ -224,6 +225,9 @@ class PostView {
 		return $html;
 	} 
 
+	/**
+	 * Metod som returnerar användarens val 
+	 */
 	public function getAction() {
 
 		switch (key($_GET)) {
@@ -273,21 +277,25 @@ class PostView {
 		}
 	}
 
-/*	public function getClientIdentifier() {
-
-		return $_SERVER["REMOTE_ADDR"];
-	} */
-
+	/**
+	 * Sätter det aktuella meddelandet 
+	 */
 	public function setMessage($msg) {
 
 		$this->message = '<p>' . $msg . '</p>';
 	}
 
+	/**
+	 * Hämtar meddelande
+	 */
 	 public function getMessage() {
 
         return $this->message;
     }
 
+    /**
+	 * Hämtar bildfilen
+	 */
     public function getImage() {
 
     	if (isset( $_FILES[self::$imgFile]) && !empty($_FILES[self::$imgFile][self::$imgName])) {
@@ -298,6 +306,9 @@ class PostView {
   		return NULL; 
     }
 
+    /**
+	 * Hämtar temporära bildfilen
+	 */
     public function getTempImage() {
 
     	if (isset( $_FILES[self::$imgFile]) && !empty($_FILES[self::$imgFile][self::$tempName])) {
@@ -308,6 +319,9 @@ class PostView {
   		return NULL; 
     }
 
+    /**
+	 * Hämtar bildens format
+	 */
     public function getImageType() {
 
     	if (isset( $_FILES[self::$imgFile][self::$imgType]) && !empty( $_FILES[self::$imgFile][self::$imgType])) {
@@ -318,6 +332,9 @@ class PostView {
   		return NULL;
     }
 
+    /**
+	 * Hämtar kommentar
+	 */
     public function getComment() {
 
     	if(isset($_POST[self::$strComment])) {
@@ -328,6 +345,9 @@ class PostView {
 	    return NULL;
     }
 
+    /**
+	 * Hämtar namn på användare som postat inlägg
+	 */
     public function getPostedBy() {
 
     	if(isset($_POST[self::$strPostedBy])) {
@@ -338,6 +358,9 @@ class PostView {
 	    return NULL;
     }
 
+    /**
+	 * Hämtar uppdaterade kommentaren
+	 */
     public function getUpdatedComment() {
 
     	if(isset($_POST[self::$updatedComment])) {
@@ -348,6 +371,9 @@ class PostView {
 	    return NULL;
     }
 
+    /**
+	 * Hämtar den valda bildens ID
+	 */
     public function getImageURL() {
 
 		if (isset($_POST[self::$deleteFile])) {
@@ -358,6 +384,9 @@ class PostView {
 		return NULL;
 	}
 
+	/**
+	 * Hämtar det valda inläggets ID 
+	 */
 	 public function getPostId() {
 
 		if (isset($_POST[self::$updateFile])) {
@@ -368,6 +397,9 @@ class PostView {
 		return NULL;
 	}
 
+	/**
+	 * Hämtar den valda kommentarens ID
+	 */
 	public function getCommentId() {
 
 		if (isset($_POST[self::$commentId])) {
@@ -378,6 +410,9 @@ class PostView {
 		return NULL;
 	}
 
+	/**
+	 * Hämtar den valda bildens ID
+	 */
 	public function getImageId() {
 
 		if (isset($_POST[self::$imageId])) {
@@ -387,14 +422,4 @@ class PostView {
 
 		return NULL;
 	}
-
-/*    public function userHasPressedUploadImage() {
-
-    	if(isset($_POST[self::$actionUpload])) {
-
-	        return  true;
-	    }
-
-	    return false;
-    } */
 }

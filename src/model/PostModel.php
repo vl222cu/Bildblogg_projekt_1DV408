@@ -65,6 +65,9 @@ class PostModel {
 		return false;
 	} */
 
+	/** 
+	 *	Metod som hämtar session för bilden
+	 */
 	public function getTargetImgId() {
 
 		if (isset($_SESSION['targetImgID'])) {
@@ -73,6 +76,9 @@ class PostModel {
 		} 
 	}
 
+	/** 
+	 *	Metod som hämtar session för kommentaren
+	 */
 	public function getTargetCommentId() {
 
 		if (isset($_SESSION['targetCommentID'])) {

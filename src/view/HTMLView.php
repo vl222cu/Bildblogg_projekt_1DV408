@@ -4,6 +4,9 @@ namespace view;
 
 class HTMLView {
 
+    /**
+     * HuvudHTML
+     */
     public function echoHTML($body) {
 
         if($body === NULL) {

@@ -5,8 +5,9 @@ require_once("src/view/HTMLView.php");
 
 session_start();
 
-$controller = new \controller\PostController();
-$htmlBody = $controller->doControl();
+$postController = new \controller\PostController();
+$htmlBodyPost = $postController->doControl();
 
-$view = new \view\HTMLview();
-$view->echoHTML($htmlBody);
+$viewPost = new \view\HTMLview();
+$viewPost->echoHTML($htmlBodyPost);
+

@@ -4,12 +4,13 @@ namespace controller;
 
 require_once("./src/view/PostView.php");
 require_once("./src/model/PostModel.php");
-require_once('./src/model/PostRepository.php');
-require_once('./src/view/ErrorPageView.php');
+require_once("./src/model/PostRepository.php");
+require_once("./src/view/ErrorPageView.php");
 
 class PostController {
 
 	private $postView;
+	private $showPostView;
 	private $postModel;
 	private $postRepository;
 	private $errorPageView;
@@ -82,7 +83,6 @@ class PostController {
 	 */
 	public function upLoadPost() {
 
-	//	$clientIdentifier = $this->postView->getClientIdentifier();
 		/**
 		 * Validerar först bildformat och bildstorlek innan bilden sparas
 		 */

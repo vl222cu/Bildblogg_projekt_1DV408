@@ -61,6 +61,8 @@ class PostRepository extends base\Repository {
 
 		    if ($statement) {
 
+		    	chmod($this->imageFolder . $targetImg, 0644);
+
 		        return true;
 
 		    } else {

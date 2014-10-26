@@ -5,8 +5,6 @@ namespace model;
 class PostModel {
 
 	public static $imgInfo;
-	public static $clientId = "clientId";
-	public static $remoteADDR = "REMOTE_ADDR";
 
 	/** Metod som kontrollerar om den uppladdade filens innehåll
 	 * är av typen gif, jpg eller png och maxstorlek 2MB
@@ -42,49 +40,6 @@ class PostModel {
 		}
 
 		return true;
-	}
-
-	/** 
-	 *	Metod som sparar användarens IP-adress
-	 */
-/*    public function setClientIdentifier($clientIdentifier) {
-
-    	$_SESSION[self::$clientId] = $_SERVER[self::$remoteADDR];
-    }
-
-    /** 
-	 *	Metod som kontrollerar användarens IP-adress
-	 */
-/*    public function getClientControl() {
-
-    	if ($_SESSION[self::$clientId] === $_SERVER[self::$remoteADDR]) {
-
-			return true;
-		}
-
-		return false;
-	} */
-
-	/** 
-	 *	Metod som hämtar session för bilden
-	 */
-	public function getTargetImgId() {
-
-		if (isset($_SESSION['targetImgID'])) {
-
-			return $_SESSION['targetImgID'];
-		} 
-	}
-
-	/** 
-	 *	Metod som hämtar session för kommentaren
-	 */
-	public function getTargetCommentId() {
-
-		if (isset($_SESSION['targetCommentID'])) {
-
-			return $_SESSION['targetCommentID'];
-		} 
 	}
 }
 

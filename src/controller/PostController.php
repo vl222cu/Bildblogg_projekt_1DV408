@@ -2,6 +2,8 @@
 
 namespace controller;
 
+require_once("./src/model/LoginModel.php");
+require_once("./src/model/LoginRepository.php");
 require_once("./src/view/PostView.php");
 require_once("./src/model/PostModel.php");
 require_once("./src/model/PostRepository.php");
@@ -9,6 +11,8 @@ require_once("./src/view/ErrorPageView.php");
 
 class PostController {
 
+	private $loginModel;
+	private $loginRepository;
 	private $postView;
 	private $showPostView;
 	private $postModel;
@@ -17,6 +21,8 @@ class PostController {
 
 	public function __construct() {
 
+		$this->loginModel = new \model\LoginModel();
+		$this->loginRepository = new \model\LoginRepository();
 		$this->postModel = new \model\PostModel();
 		$this->postRepository = new \model\PostRepository();
 		$this->postView = new \view\PostView($this->postModel);
@@ -34,6 +40,18 @@ class PostController {
 		try {
 
 			switch ($userAction) {
+
+				case \view\PostView::$actionLoginPage:
+					return $this->postView->showLoginPageHTML();
+					break;
+
+				case \view\PostView::$actionLogin:
+					return $this->loginUser();
+					break;
+
+				case \view\PostView::$actionLogout:
+					return $this->logoutUser();
+					break;
 
 				case \view\PostView::$actionUploadPage:
 					return $this->postView->uploadPageHTML();
@@ -79,6 +97,64 @@ class PostController {
 	}
 
 	/**
+	 * Loggar in användaren
+	 */
+	public function loginUser() {
+
+		/** 
+		 * Förhindrar sessionstöld 
+	 	*/
+		if ($this->loginModel->userIsLoggedIn()) {
+
+			if ($this->loginModel->getSessionControl() == false) {
+
+				return $this->postView->showLoginPageHTML();
+
+			} else {
+
+				return $this->showAllPosts();
+			}
+
+		}
+
+		if ($this->loginModel->authenticateUser($this->postView->getPostedUserName(), $this->postView->getPostedPassword())) {
+
+				$this->loginModel->setSessionVariables();
+				$this->postView->setMessage(\view\PostView::MESSAGE_SUCCESS_LOGIN);							
+
+				return $this->showAllPosts();
+
+		} else {
+						
+			if ($this->postView->getPostedUserName() == "") {
+
+				$this->postView->setMessage(\view\PostView::MESSAGE_ERROR_USERNAME);
+
+			} elseif ($this->postView->getPostedPassword() == "") {
+
+				$this->postView->setMessage(\view\PostView::MESSAGE_ERROR_PASSWORD);
+
+			} else {
+
+				$this->postView->setMessage(\view\PostView::MESSAGE_ERROR_USERNAME_PASSWORD);
+			} 					
+			
+			return $this->postView->showLoginPageHTML();
+		} 
+	}
+
+	/**
+	 * Loggar ut användaren
+	 */
+	public function logoutUser() {
+
+		$this->loginModel->logout();
+		$this->postView->setMessage(\view\PostView::MESSAGE_SUCCESS_LOGOUT);
+
+		return $this->showAllPosts();
+	}	
+
+	/**
 	 * Kontrollerar funktion för uppladdning av bild och kommentar till server och databas
 	 */
 	public function upLoadPost() {
@@ -90,7 +166,6 @@ class PostController {
 
 			if ($this->postRepository->saveImage($this->postView->getPostedBy(), $this->postView->getImage(), $this->postView->getComment())) {
 
-			//	$this->postModel->setClientIdentifier($clientIdentifier);
 				$this->postView->setMessage(\view\PostView::MESSAGE_UPLOAD_SUCCESSED);
 
 				return $this->showAllPosts(); 
@@ -116,9 +191,18 @@ class PostController {
 	 */
 	public function showAllPosts() {
 
-		$images = $this->postRepository->getAllImagesFromDB();
+		if ($this->loginModel->userIsLoggedIn()) {
 			
-		return $this->postView->showAllImagesHTML($images);		
+			$images = $this->postRepository->getAllImagesFromDB();
+				
+			return $this->postView->showAllImagesWithCRUDHTML($images);	
+
+		} else {
+
+			$images = $this->postRepository->getAllImagesFromDB();
+				
+			return $this->postView->showAllImagesHTML($images);	
+		}	
 	}
 
 	/**
@@ -126,24 +210,15 @@ class PostController {
 	 */
 	public function deletePost() {
 
-		if ($this->postModel->getTargetImgId() || $this->postModel->getTargetCommentId()) {
+		if ($this->postRepository->deletePostFromDB($this->postView->getImageURL())) {
 
-			if ($this->postRepository->deletePostFromDB($this->postView->getImageURL())) {
+			$this->postView->setMessage(\view\PostView::MESSAGE_DELETE_SUCCESSED);
 
-				$this->postView->setMessage(\view\PostView::MESSAGE_DELETE_SUCCESSED);
-
-				return $this->showAllPosts();
-
-			} else {
-
-				$this->postView->setMessage(\view\PostView::MESSAGE_DELETE_FAILED);
-
-				return $this->showAllPosts();
-			}
+			return $this->showAllPosts();
 
 		} else {
 
-			$this->postView->setMessage(\view\PostView::MESSAGE_DELETE_NOT_ALLOWED);
+			$this->postView->setMessage(\view\PostView::MESSAGE_DELETE_FAILED);
 
 			return $this->showAllPosts();
 		}
@@ -154,19 +229,9 @@ class PostController {
 	 */
 	public function updatePostedCommentPage() {
 
-		if ($this->postModel->getTargetImgId() || $this->postModel->getTargetCommentId()) {	
+		$selectedPost = $this->postRepository->getSelectedPostToEdit($this->postView->getPostId());
 
-			$selectedPost = $this->postRepository->getSelectedPostToEdit($this->postView->getPostId());
-
-			return $this->postView->updateCommentPageHTML($selectedPost);
-
-		} else {
-
-			$this->postView->setMessage(\view\PostView::MESSAGE_UPDATE_COMMENT_NOT_ALLOWED);
-
-			return $this->showAllPosts();
-
-		}
+		return $this->postView->updateCommentPageHTML($selectedPost);
 	}
 
 	/**
@@ -194,20 +259,10 @@ class PostController {
 	 * Returnerar HTML-sida för uppdatering av bild
 	 */
 	public function updatePostedImagePage() {
+			
+		$selectedPost = $this->postRepository->getSelectedPostToEdit($this->postView->getPostId());
 
-		if ($this->postModel->getTargetImgId() || $this->postModel->getTargetCommentId()) {	
-		
-			$selectedPost = $this->postRepository->getSelectedPostToEdit($this->postView->getPostId());
-
-			return $this->postView->updateImagePageHTML($selectedPost);
-
-		} else {
-
-			$this->postView->setMessage(\view\PostView::MESSAGE_UPDATE_IMAGE_NOT_ALLOWED);
-
-			return $this->showAllPosts();
-		}
-
+		return $this->postView->updateImagePageHTML($selectedPost);
 	}
 
 	/**

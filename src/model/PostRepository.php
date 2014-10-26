@@ -61,9 +61,6 @@ class PostRepository extends base\Repository {
 
 		    if ($statement) {
 
-		    	$_SESSION['targetImgID'] = $targetImg;
-		    	$_SESSION['targetCommentID'] = $comment;
-
 		        return true;
 
 		    } else {

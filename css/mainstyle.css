@@ -22,14 +22,26 @@ h1 {
     text-shadow: 2px 2px 0 #FFF;
 }
 
-.msgstatus {
+.Msgstatus {
     text-align: center;
+    color: #4EB00E;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.loginmsg {
     color: #4EB00E;
     text-shadow: 2px 2px 0 #000;
 }
 
 .return {
     color: #FFF;
+    margin-left: 20px;
+}
+
+#loginwrapper,
+#uploadwrapper {
+    margin-top: 50px;
+    margin-left: 20px;
 }
 
 #formwrapper {
@@ -42,7 +54,9 @@ h1 {
 
 #file, 
 #comment,
-#postedby {
+#postedby,
+#nameinput,
+#passwordinput {
     margin-right: 10px;
     margin-left: 5px;
     padding: 5px;
@@ -78,8 +92,9 @@ h1 {
    color: #FFF;
 }
 
+#loginButton,
 #uploadButton,
-#uploadPageButton,
+.uploadPageButton,
 #changeButton,
 #deleteButton,
 #updateImageButton,

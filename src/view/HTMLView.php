@@ -19,7 +19,7 @@ class HTMLView {
                 <html xmlns='http://www.w3.org/1999/xhtml'>
                 <head>
                 <title>Project photoblog vl222cu</title>
-                <link rel='stylesheet' href='css/mainstyle.css' media='screen'>
+                <link rel='stylesheet' href='css/mainstyle.css' media='screen' />
                 <meta http-equiv='content-type' content='text/html; charset=utf-8' />
                 <script src='//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'></script>
                 </head>

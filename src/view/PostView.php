@@ -5,7 +5,10 @@ namespace view;
 class PostView {
 
 	private $postModel;
+	private $name;
 	private $message = "";
+	private static $userName = 'Username';
+	private static $password = 'Password';
 	private static $strComment = "comment";
 	private static $strPostedBy = "postedby";
 	private static $imgFile = "file";
@@ -19,6 +22,9 @@ class PostView {
 	private static $commentId = "update_comment";
 	private static $imageId = "update_image";
 
+	public static $actionLoginPage = "loginpage";
+	public static $actionLogin = "login";
+	public static $actionLogout = "logout";
 	public static $actionUpload = "upload";
 	public static $actionUploadPage = "uploadpage";
 	public static $actionReturn = "return";
@@ -27,10 +33,14 @@ class PostView {
 	public static $actionUpdateComment = "updatecomment";
 	public static $actionUpdateImagePage = "updateimagepage";
 	public static $actionUpdateImage = "updateimage";
-	public static $actionLoginPage = "loginpage";
 
+	const MESSAGE_ERROR_USERNAME_PASSWORD = 'Felaktigt användarnamn och/eller lösenord';
+	const MESSAGE_ERROR_USERNAME = 'Användarnamn saknas';
+	const MESSAGE_ERROR_PASSWORD = 'Lösenord saknas';
+	const MESSAGE_SUCCESS_LOGIN = 'Inloggning lyckades';
+	const MESSAGE_SUCCESS_LOGOUT = 'Utloggningen lyckades';
 	const MESSAGE_UPLOAD_SUCCESSED = "Uppladdning av inlägg lyckades";
-	const MESSAGE_ERROR_UPLOAD_FAILED = "Uppladdning av inlägg misslyckades. Kontrollera att bilden är av format jpg, gif eller png och ej större än 2MB med maxbredd 800px och maxlängd 800px";
+	const MESSAGE_ERROR_UPLOAD_FAILED = "Uppladdning av inlägg misslyckades. Kontrollera att bilden är av format jpg/jpeg, gif eller png och ej större än 2MB med maxbredd 800px och maxlängd 800px";
 	const MESSAGE_ERROR_UPLOAD_TO_SERVER = "Något gick fel! Det postade inlägget kunde inte sparas";
 	const MESSAGE_DELETE_SUCCESSED = "Det postade inlägget är borttaget";
 	const MESSAGE_DELETE_FAILED = "Något gick fel! Det postade inlägget kunde inte tas bort";
@@ -39,14 +49,41 @@ class PostView {
 	const MESSAGE_UPDATE_IMAGE_SUCCESSED = "Bilden är uppdaterad";
 	const MESSAGE_ERROR_UPDATE_IMAGE_TO_SERVER = "Något gick fel! Det gick inte att uppdatera bilden";
 	const MESSAGE_ERROR_UPDATE_IMAGE_FAILED = "Uppdatering av inlägg misslyckades. Kontrollera att bilden är av format jpg, gif eller png och ej större än 2MB med maxbredd 800px och maxlängd 800px";
-	const MESSAGE_DELETE_NOT_ALLOWED = "Ajabaja! Du får bara ta bort dina egna inlägg";
-	const MESSAGE_UPDATE_COMMENT_NOT_ALLOWED = "Ajabaja! Du får bara uppdatera dina egna kommentarer"; 
-	const MESSAGE_UPDATE_IMAGE_NOT_ALLOWED = "Ajabaja! Du får bara uppdatera dina egna bilder";
 
 	public function __construct(\model\PostModel $postModel) {
 		
 		$this->postModel = $postModel;
+		$this->name = isset($_POST[self::$userName]) ? $_POST[self::$userName] : '';
 
+	}
+
+	public function showLoginPageHTML() {
+
+		$html = "
+			<div id='maincontainer'>
+				 <h1>Vivis bildblogg</h1>
+				 <p><a href='?return' class='return'>Tillbaka</a></p>
+				 <form name='login' method='post' accept-charset='utf-8' action='?login'>			
+					<div id='loginwrapper'>
+					<p>Login - Skriv in användarnamn och lösenord</p>";
+
+		if($this->getMessage() !== null) {
+
+			$html .= "<div class='loginmsg'>$this->message</div>";
+		};
+
+	    $html .= "
+						<p><label for='username'>Användarnamn</label>
+						<input type='username' name='Username' id='nameinput' value='$this->name'></p>
+						<p><label for='password'>Lösenord</label>
+						<input type='password' name='Password' id='passwordinput'></p>
+						</div>
+						<p><input type='submit' name='submit' id='loginButton' value='Logga in'></p>			
+					</form>
+				</div>
+			";
+
+			return $html;
 	}
 
 	/** 
@@ -58,22 +95,24 @@ class PostView {
 		 	<div id='maincontainer'>
 		 		<div id='content'>
 		 			<h1>Vivis bildblogg</h1>
-		 			<p><a href='?return' class='return'>Tillbaka</a></p>";
+		 			<p><a href='?return' class='return'>Tillbaka</a></p>
+		 			<div id='uploadwrapper'>";
 
 		if($this->getMessage() !== null) {
 
-			$html .= "<div class=msgstatus>$this->message</div>";
+			$html .= "<div class=Msgstatus>$this->message</div>";
 		};
 		
 		$html .= "			
-			<div id='formwrapper'>
-				 		<form action='?upload' method='post' enctype='multipart/form-data'>
-							Välj bild och skriv gärna en kommentar: 
-							<p><input type='file' name='file' id='file' /></p>  
-							<p><textarea rows='10' cols='80' name='comment' id='comment' placeholder='Lägg till kommentar' /></textarea></p>
-							<p><input type='text' name='postedby' id='postedby' placeholder='Fyll i ditt namn här' /></p>
-							<input type='submit' name='submit' id='uploadButton' value='Ladda upp' />
-						</form>
+						<div id='formwrapper'>
+					 		<form action='?upload' method='post' enctype='multipart/form-data'>
+								Välj bild och skriv gärna en kommentar: 
+								<p><input type='file' name='file' id='file' /></p>  
+								<p><textarea rows='10' cols='80' name='comment' id='comment' placeholder='Lägg till kommentar' /></textarea></p>
+								<p><input type='text' name='postedby' id='postedby' placeholder='Fyll i ditt namn här' /></p>
+								<input type='submit' name='submit' id='uploadButton' value='Ladda upp' />
+							</form>
+						</div>
 					</div>
 				</div>
 		 	</div>";
@@ -98,8 +137,58 @@ class PostView {
 		};
 
 		$html .= "
+			<p><a href='?loginpage'>Logga in</a></p>
 			<form enctype='multipart/form-data' method='post' action='?uploadpage'>
-			 	<input type='submit' name='submit' id='uploadPageButton' value='Posta nytt inlägg' />
+			 	<input type='submit' name='submit' class='uploadPageButton' value='Posta nytt inlägg'>
+			</form>";
+
+		foreach ($dbImages as $date => $images) {
+		
+			foreach ($images as $image) {
+
+				$postId = $image["imgID"];
+				$postedBy = strip_tags($image["name"]);
+				$imageURL = $image["image"];
+				$commentText = strip_tags($image["comment"]);
+
+				$html .= "
+								<div class='image'>
+									<a title='photoblog' href='./images/$imageURL'>
+									<img src='./images/$imageURL' alt='blogpost'/></a>
+									<div class='commentwrapper'>
+										<p>$commentText</p>
+										<p>Inlägget är postat av: $postedBy</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>";
+			}
+		}
+
+		return $html;
+	}
+
+	/** 
+	 * HTML som visar samtliga inlägg
+	 */
+	public function showAllImagesWithCRUDHTML(array $dbImages) {
+
+		$html = "
+		 	<div id='maincontainer'>
+		 		<div id='content'>
+		 			<h1>Vivis bildblogg</h1>
+			 		<div id='contentwrapper'>";
+
+		if($this->getMessage() !== null) {
+
+			$html .= "<div class=Msgstatus>$this->message</div>";
+		};
+
+		$html .= "
+			<p><a href='?logout'>Logga ut</a></p>
+			<form enctype='multipart/form-data' method='post' action='?uploadpage'>
+			 	<input type='submit' name='submit' class='uploadPageButton' value='Posta nytt inlägg' />
 			</form>";
 
 		foreach ($dbImages as $date => $images) {
@@ -114,7 +203,7 @@ class PostView {
 				$html .= "
 					<div class='image'>
 						<a title='photoblog' href='./images/$imageURL'>
-						<img src='./images/$imageURL'/></a>
+						<img src='./images/$imageURL' alt='blogpost'/></a>
 						<div class='commentwrapper'>
 							<p>$commentText</p>
 							<p>Inlägget är postat av: $postedBy</p>
@@ -123,20 +212,20 @@ class PostView {
 							<tr>
 								<td>
 									<form action='?delete' enctype='multipart/form-data' method='post'>
-										<input type='hidden' value='$imageURL' name='delete_file' />
-						 				<input type='submit' name='submit' id='deleteButton' value='Radera inlägg' />
+										<input type='hidden' value='$imageURL' name='delete_file'>
+						 				<input type='submit' name='submit' id='deleteButton' value='Radera inlägg'>
 						 			</form>
 					 			</td>
 					 			<td>
 						 			<form action='?updatecommentpage' enctype='multipart/form-data' method='post'>
-						 				<input type='hidden' value='$postId' name='update_file' />
-						 				<input type='submit' name='submit' id='updateCommentButton' value='Ändra kommentar' />
+						 				<input type='hidden' value='$postId' name='update_file'>
+						 				<input type='submit' name='submit' id='updateCommentButton' value='Ändra kommentar'>
 						 			</form>
 					 			</td>
 					 			<td>					 			
 						 			<form action='?updateimagepage' enctype='multipart/form-data' method='post'>
-						 				<input type='hidden' value='$postId' name='update_file' />
-						 				<input type='submit' name='submit' id='updateImageButton' value='Ändra bild' />
+						 				<input type='hidden' value='$postId' name='update_file'>
+						 				<input type='submit' name='submit' id='updateImageButton' value='Ändra bild'>
 						 			</form>
 					 			</td>					 			
 					 		</tr>
@@ -167,7 +256,7 @@ class PostView {
 
 		if($this->getMessage() !== null) {
 
-			$html .= "<div class=msgstatus>$this->message</div>";
+			$html .= "<div class=Msgstatus>$this->message</div>";
 		};
 
 		$html .= "
@@ -178,8 +267,8 @@ class PostView {
 				<form action='?updatecomment' method='post' enctype='multipart/form-data'>
 					Uppdatera kommentar:  
 					<p><textarea rows='4' cols='80' name='commentupdate' id='commentupdate'/>$postCommentText</textarea></p>
-					<input type='hidden' value='$postId' name='update_comment' />
-					<input type='submit' name='submit' id='updateCommentButton' value='Uppdatera kommentar' />
+					<input type='hidden' value='$postId' name='update_comment'>
+					<input type='submit' name='submit' id='updateCommentButton' value='Uppdatera kommentar'>
 				</form>
 			</div>";
 					
@@ -205,20 +294,20 @@ class PostView {
 
 		if($this->getMessage() !== null) {
 
-			$html .= "<div class=msgstatus>$this->message</div>";
+			$html .= "<div class=Msgstatus>$this->message</div>";
 		};
 
 		$html .= "
 			<div class='image'>
-				<img src='./images/$postURL'/>
+				<img src='./images/$postURL' alt='blogpost'/>
 			</div>
 			<div id='formwrapper'>
 				<form action='?updateimage' method='post' enctype='multipart/form-data'>
 					<p>$postCommentText</p>
 					Uppdatera bild: 
 					<p><input type='file' name='file' id='file' /></p>  
-					<input type='hidden' value='$postId' name='update_image' />
-					<input type='submit' name='submit' id='updateImageButton' value='Uppdatera bild' />
+					<input type='hidden' value='$postId' name='update_image'>
+					<input type='submit' name='submit' id='updateImageButton' value='Uppdatera bild'>
 				</form>
 			</div>";
 					
@@ -231,6 +320,21 @@ class PostView {
 	public function getAction() {
 
 		switch (key($_GET)) {
+
+			case self::$actionLoginPage:
+				$action = self::$actionLoginPage;
+				return $action;
+				break;
+
+			case self::$actionLogin:
+				$action = self::$actionLogin;
+				return $action;
+				break;
+
+			case self::$actionLogout:
+				$action = self::$actionLogout;
+				return $action;
+				break;
 
 			case self::$actionUploadPage:
 				$action = self::$actionUploadPage;
@@ -292,6 +396,30 @@ class PostView {
 
         return $this->message;
     }
+
+    public function getPostedUserName() {
+
+	 	if (empty($_POST[self::$userName])) {
+
+	 		return "";
+
+	 	} else {
+
+       		return $_POST[self::$userName];
+    	}
+    }
+
+    public function getPostedPassword() {
+
+    	if (empty($_POST[self::$password])) {
+
+    		return "";
+
+    	} else {
+        
+        	return $_POST[self::$password];
+        }
+   }
 
     /**
 	 * Hämtar bildfilen

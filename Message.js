@@ -2,9 +2,11 @@
 
 $(document).ready(function () {
             var $statusText = $(".msgstatus");
-            if ($statusText.length) {
+            var $loginText = $(".loginmsg");
+            if ($statusText.length || $loginText.length) {
                 setTimeout(function () {
                     $statusText.fadeOut();
+                    $loginText.fadeOut();
                 }, 5000);
             }
         });

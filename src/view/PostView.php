@@ -133,7 +133,7 @@ class PostView {
 
 		if($this->getMessage() !== null) {
 
-			$html .= "<div class=msgstatus>$this->message</div>";
+			$html .= "<div class=Msgstatus>$this->message</div>";
 		};
 
 		$html .= "
@@ -159,12 +159,16 @@ class PostView {
 										<p>$commentText</p>
 										<p>Inlägget är postat av: $postedBy</p>
 									</div>
-								</div>
-							</div>
-						</div>
-					</div>";
+								</div>";
+
 			}
 		}
+
+		$html .= "
+							</div>
+						</div>
+					</div>
+				";
 
 		return $html;
 	}
@@ -231,8 +235,15 @@ class PostView {
 					 		</tr>
 			 			</table>
 					</div>";
+
 			}
 		}
+
+		$html .= "
+							</div>
+						</div>
+					</div>
+				";
 
 		return $html;
 	}

@@ -22,11 +22,11 @@ Inloggning
 
 > Just nu funkar inloggningen endast som administratörsinloggning med användarnamn "Vivi" och lösenord "Lammet". Som inloggad finns samtliga funktioner tillgängliga: 
 
-* Lägga till inlägg
+* Posta nytt inlägg
 * Radera inlägg
 * Ändra kommentar
 * Ändra bild
 * 
 
-> Vid ej inloggad finns endast funktion "Lägga till inlägg" tillgänglig. 
+> Vid ej inloggad finns endast funktion "Posta nytt inlägg" tillgänglig. 
 

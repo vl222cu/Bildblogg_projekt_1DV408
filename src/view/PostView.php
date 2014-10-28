@@ -6,6 +6,8 @@ class PostView {
 
 	private $postModel;
 	private $name;
+	private $commentText;
+	private $postedByName;
 	private $message = "";
 	private static $userName = 'Username';
 	private static $password = 'Password';
@@ -54,6 +56,8 @@ class PostView {
 		
 		$this->postModel = $postModel;
 		$this->name = isset($_POST[self::$userName]) ? $_POST[self::$userName] : '';
+		$this->commentText = isset($_POST[self::$strComment]) ? $_POST[self::$strComment] : '';
+		$this->postedByName = isset($_POST[self::$strPostedBy]) ? $_POST[self::$strPostedBy] : '';
 
 	}
 
@@ -108,8 +112,8 @@ class PostView {
 					 		<form action='?upload' method='post' enctype='multipart/form-data'>
 								Välj bild och skriv gärna en kommentar: 
 								<p><input type='file' name='file' id='file' /></p>  
-								<p><textarea rows='10' cols='80' name='comment' id='comment' placeholder='Lägg till kommentar' /></textarea></p>
-								<p><input type='text' name='postedby' id='postedby' placeholder='Fyll i ditt namn här' /></p>
+								<p><textarea rows='10' cols='80' name='comment' id='comment' placeholder='Lägg till kommentar' />$this->commentText</textarea></p>
+								<p><input type='text' name='postedby' id='postedby' value='$this->postedByName' placeholder='Fyll i ditt namn här' /></p>
 								<input type='submit' name='submit' id='uploadButton' value='Ladda upp' />
 							</form>
 						</div>
